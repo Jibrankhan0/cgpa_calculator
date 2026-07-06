@@ -62,13 +62,9 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   void _setupFocusListeners() {
     _nameFocus.addListener(() {
       if (!_nameFocus.hasFocus && _nameController.text != widget.course.name) {
-        _notifier.updateCourse(
-              widget.course.id,
-              name: _nameController.text,
-            );
+        _notifier.updateCourse(widget.course.id, name: _nameController.text);
       }
     });
-
     _midFocus.addListener(() => _onMarksFocusLost('mid'));
     _finalFocus.addListener(() => _onMarksFocusLost('final'));
     _sessionalFocus.addListener(() => _onMarksFocusLost('sessional'));
@@ -77,10 +73,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
         double val = double.tryParse(_totalController.text) ?? 0;
         if (val > 100) val = 100;
         if (val != widget.course.totalMarks) {
-          _notifier.updateCourse(
-            widget.course.id,
-            totalMarks: val,
-          );
+          _notifier.updateCourse(widget.course.id, totalMarks: val);
         }
       }
     });
@@ -103,25 +96,16 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
 
     switch (type) {
       case 'mid':
-        _notifier.updateCourse(
-              widget.course.id,
-              midMarks: val,
-              totalMarks: val + widget.course.finalMarks + widget.course.sessionalMarks,
-            );
+        _notifier.updateCourse(widget.course.id, midMarks: val,
+            totalMarks: val + widget.course.finalMarks + widget.course.sessionalMarks);
         break;
       case 'final':
-        _notifier.updateCourse(
-              widget.course.id,
-              finalMarks: val,
-              totalMarks: widget.course.midMarks + val + widget.course.sessionalMarks,
-            );
+        _notifier.updateCourse(widget.course.id, finalMarks: val,
+            totalMarks: widget.course.midMarks + val + widget.course.sessionalMarks);
         break;
       case 'sessional':
-        _notifier.updateCourse(
-              widget.course.id,
-              sessionalMarks: val,
-              totalMarks: widget.course.midMarks + widget.course.finalMarks + val,
-            );
+        _notifier.updateCourse(widget.course.id, sessionalMarks: val,
+            totalMarks: widget.course.midMarks + widget.course.finalMarks + val);
         break;
     }
   }
@@ -161,65 +145,6 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     super.dispose();
   }
 
-  Widget _buildMarkField({
-    required String label,
-    required TextEditingController controller,
-    required FocusNode focusNode,
-  }) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: AppTheme.textMuted,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-            ),
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              keyboardType: TextInputType.number,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
-              ),
-              decoration: const InputDecoration(
-                hintText: '0',
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-                hintStyle: TextStyle(color: AppTheme.textMuted),
-              ),
-              onChanged: (val) {
-                double d = double.tryParse(val) ?? 0;
-                if (d > 100) {
-                  d = 100;
-                  controller.text = '100';
-                  controller.selection = TextSelection.fromPosition(
-                    TextPosition(offset: controller.text.length),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isLab = widget.course.isPractical;
@@ -229,9 +154,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
         padding: const EdgeInsets.only(bottom: 12),
         child: GlassCard(
           padding: const EdgeInsets.all(16),
-          borderColor: isLab
-              ? AppTheme.accentPrimary.withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.1),
+          borderColor: isLab ? const Color(0x336366F1) : const Color(0x1AFFFFFF),
           child: Column(
             children: [
               // Top Row: Lab toggle + Course Name
@@ -239,25 +162,19 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      _notifier.updateCourse(
-                            widget.course.id,
-                            isPractical: !isLab,
-                            creditHours: !isLab ? 1.0 : widget.course.creditHours,
-                          );
+                      _notifier.updateCourse(widget.course.id,
+                          isPractical: !isLab,
+                          creditHours: !isLab ? 1.0 : widget.course.creditHours);
                       HapticFeedback.lightImpact();
                     },
                     child: Container(
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isLab
-                            ? AppTheme.accentPrimary.withValues(alpha: 0.15)
-                            : Colors.white.withValues(alpha: 0.05),
+                        color: isLab ? const Color(0x266366F1) : const Color(0x0DFFFFFF),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isLab
-                              ? AppTheme.accentPrimary.withValues(alpha: 0.3)
-                              : Colors.white.withValues(alpha: 0.08),
+                          color: isLab ? const Color(0x4D6366F1) : const Color(0x14FFFFFF),
                         ),
                       ),
                       child: Icon(
@@ -277,12 +194,12 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
-                        hintStyle: TextStyle(
-                          color: AppTheme.textMuted.withValues(alpha: 0.5),
+                        hintStyle: GoogleFonts.inter(
+                          color: const Color(0x8094A3B8),
                           fontSize: 14,
                         ),
                       ),
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textPrimary,
@@ -295,23 +212,11 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
               // Middle Row: Marks fields
               Row(
                 children: [
-                  _buildMarkField(
-                    label: 'MID',
-                    controller: _midController,
-                    focusNode: _midFocus,
-                  ),
+                  _buildMarkField(label: 'MID', controller: _midController, focusNode: _midFocus),
                   const SizedBox(width: 10),
-                  _buildMarkField(
-                    label: 'FINAL',
-                    controller: _finalController,
-                    focusNode: _finalFocus,
-                  ),
+                  _buildMarkField(label: 'FINAL', controller: _finalController, focusNode: _finalFocus),
                   const SizedBox(width: 10),
-                  _buildMarkField(
-                    label: 'SESSIONAL',
-                    controller: _sessionalController,
-                    focusNode: _sessionalFocus,
-                  ),
+                  _buildMarkField(label: 'SES.', controller: _sessionalController, focusNode: _sessionalFocus),
                 ],
               ),
               const SizedBox(height: 16),
@@ -322,66 +227,43 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'CREDITS',
-                        style: GoogleFonts.inter(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textMuted,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      Text('CREDITS', style: GoogleFonts.inter(
+                        fontSize: 9, fontWeight: FontWeight.w700,
+                        color: AppTheme.textMuted, letterSpacing: 0.5,
+                      )),
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
+                          color: const Color(0x0DFFFFFF),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                          border: Border.all(color: const Color(0x14FFFFFF)),
                         ),
                         child: isLab
                             ? const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 8),
-                                child: Text(
-                                  '1',
-                                  style: TextStyle(
-                                    color: AppTheme.accentPrimary,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 14,
-                                  ),
-                                ),
+                                child: Text('1', style: TextStyle(
+                                  color: AppTheme.accentPrimary,
+                                  fontWeight: FontWeight.w800, fontSize: 14,
+                                )),
                               )
                             : DropdownButton<double>(
                                 value: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
                                         .contains(widget.course.creditHours)
-                                    ? widget.course.creditHours
-                                    : 3.0,
+                                    ? widget.course.creditHours : 3.0,
                                 dropdownColor: AppTheme.bgGradientStart,
                                 underline: const SizedBox(),
                                 isDense: true,
-                                icon: const Icon(
-                                  Icons.expand_more,
-                                  size: 16,
-                                  color: AppTheme.textMuted,
-                                ),
+                                icon: const Icon(Icons.expand_more, size: 16, color: AppTheme.textMuted),
                                 items: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0].map((e) {
-                                  return DropdownMenuItem(
-                                    value: e,
-                                    child: Text(
-                                      '${e.toInt()}',
-                                      style: const TextStyle(
-                                        color: AppTheme.textPrimary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  );
+                                  return DropdownMenuItem(value: e, child: Text(
+                                    '${e.toInt()}', style: const TextStyle(
+                                      color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                                  ));
                                 }).toList(),
                                 onChanged: (val) {
                                   if (val != null) {
-                                    _notifier.updateCourse(
-                                          widget.course.id,
-                                          creditHours: val,
-                                        );
+                                    _notifier.updateCourse(widget.course.id, creditHours: val);
                                     HapticFeedback.selectionClick();
                                   }
                                 },
@@ -394,24 +276,17 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'TOTAL',
-                        style: GoogleFonts.inter(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.textMuted,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      Text('TOTAL', style: GoogleFonts.inter(
+                        fontSize: 9, fontWeight: FontWeight.w700,
+                        color: AppTheme.textMuted, letterSpacing: 0.5,
+                      )),
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppTheme.accentPrimary.withValues(alpha: 0.1),
+                          color: const Color(0x196366F1),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppTheme.accentPrimary.withValues(alpha: 0.2),
-                          ),
+                          border: Border.all(color: const Color(0x336366F1)),
                         ),
                         child: SizedBox(
                           width: 42,
@@ -420,17 +295,16 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                             focusNode: _totalFocus,
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: GoogleFonts.inter(
                               color: AppTheme.accentPrimary,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14,
+                              fontWeight: FontWeight.w800, fontSize: 14,
                             ),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               hintText: '0',
                               border: InputBorder.none,
                               isDense: true,
-                              contentPadding: EdgeInsets.symmetric(vertical: 6),
-                              hintStyle: TextStyle(color: AppTheme.textMuted),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                              hintStyle: GoogleFonts.inter(color: AppTheme.textMuted),
                             ),
                             onChanged: (val) {
                               double d = double.tryParse(val) ?? 0;
@@ -453,16 +327,10 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                   const SizedBox(width: 12),
                   // Delete
                   IconButton(
-                    icon: const Icon(
-                      Icons.delete_outline_rounded,
-                      size: 20,
-                      color: AppTheme.textMuted,
-                    ),
+                    icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.textMuted),
                     onPressed: () {
                       HapticFeedback.mediumImpact();
-                      _notifier.removeCourse(
-                            widget.course.id,
-                          );
+                      _notifier.removeCourse(widget.course.id);
                     },
                   ),
                 ],
@@ -470,6 +338,58 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMarkField({
+    required String label,
+    required TextEditingController controller,
+    required FocusNode focusNode,
+  }) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(label, style: GoogleFonts.inter(
+            fontSize: 10, fontWeight: FontWeight.w700,
+            color: AppTheme.textMuted, letterSpacing: 0.5,
+          )),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0x0DFFFFFF),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0x14FFFFFF)),
+            ),
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary,
+              ),
+              decoration: InputDecoration(
+                hintText: '0',
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                hintStyle: GoogleFonts.inter(color: AppTheme.textMuted),
+              ),
+              onChanged: (val) {
+                double d = double.tryParse(val) ?? 0;
+                if (d > 100) {
+                  d = 100;
+                  controller.text = '100';
+                  controller.selection = TextSelection.fromPosition(
+                    TextPosition(offset: controller.text.length),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

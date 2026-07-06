@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 
 class GlassCard extends StatelessWidget {
   final Widget child;
@@ -18,10 +17,10 @@ class GlassCard extends StatelessWidget {
     required this.child,
     this.blur = 20.0,
     this.opacity = 0.06,
+    this.useBlur = false,
     this.padding,
     this.borderRadius,
     this.borderColor,
-    this.useBlur = true,
     this.color,
     this.glowColor,
   });
@@ -36,7 +35,7 @@ class GlassCard extends StatelessWidget {
         color: (color ?? Colors.white).withValues(alpha: opacity),
         borderRadius: radius,
         border: Border.all(
-          color: borderColor ?? Colors.white.withValues(alpha: 0.1),
+          color: borderColor ?? const Color(0x1AFFFFFF),
           width: 1,
         ),
         boxShadow: [
@@ -46,10 +45,10 @@ class GlassCard extends StatelessWidget {
               blurRadius: 24,
               offset: const Offset(0, 8),
             ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+          const BoxShadow(
+            color: Color(0x1A000000),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -57,12 +56,15 @@ class GlassCard extends StatelessWidget {
     );
 
     if (useBlur) {
-      content = BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        child: content,
+      content = ClipRRect(
+        borderRadius: radius,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          child: content,
+        ),
       );
     }
 
-    return ClipRRect(borderRadius: radius, child: content);
+    return content;
   }
 }
