@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/semester_provider.dart';
 import '../services/gpa_service.dart';
@@ -12,7 +11,6 @@ import '../widgets/glass_card.dart';
 import '../widgets/course_input_card.dart';
 import '../widgets/empty_state.dart';
 
-
 class MarksSheetScreen extends ConsumerStatefulWidget {
   const MarksSheetScreen({super.key});
 
@@ -21,7 +19,7 @@ class MarksSheetScreen extends ConsumerStatefulWidget {
 }
 
 class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
   @override
@@ -292,7 +290,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                               ),
                             ],
                           ),
-                        ).animate().fadeIn(duration: 300.ms),
+                        ),
                         const SizedBox(height: 12),
                         Container(
                           width: double.infinity,
@@ -301,12 +299,10 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.accentPrimary
-                                .withValues(alpha: 0.08),
+                            color: const Color(0x146366F1),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: AppTheme.accentPrimary
-                                  .withValues(alpha: 0.15),
+                              color: const Color(0x266366F1),
                             ),
                           ),
                           child: Row(
@@ -345,10 +341,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                               ),
                             ],
                           ),
-                        ).animate().fadeIn(
-                              delay: 100.ms,
-                              duration: 300.ms,
-                            ),
+                        ),
                         const SizedBox(height: 16),
                         if (semester.courses.isEmpty)
                           const Padding(
@@ -370,14 +363,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                               course: entry.value,
                               notifierOverride:
                                   ref.read(marksSheetProvider.notifier),
-                            )
-                                .animate()
-                                .fadeIn(
-                                  delay: Duration(
-                                      milliseconds: 40 * entry.key),
-                                  duration: 300.ms,
-                                )
-                                .slideY(begin: 0.03, end: 0);
+                            );
                           }),
                       ],
                     ),
@@ -429,7 +415,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
         backgroundColor: AppTheme.bgGradientStart,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: AppTheme.borderGlass),
+          side: const BorderSide(color: AppTheme.borderGlass),
         ),
         title: Text(
           'Delete $semesterName?',

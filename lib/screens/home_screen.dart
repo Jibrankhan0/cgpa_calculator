@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../providers/semester_provider.dart';
@@ -22,6 +21,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const _sectionLabelStyle = TextStyle(
+    fontSize: 12,
+    color: AppTheme.textMuted,
+    letterSpacing: 1.5,
+    fontWeight: FontWeight.w800,
+  );
+
   @override
   void initState() {
     super.initState();
@@ -52,13 +58,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Container(
               height: 40,
               width: 40,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.accentPrimary.withValues(alpha: 0.2),
+                    color: Color(0x336366F1),
                     blurRadius: 12,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
@@ -110,7 +116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ModeSelector(
               currentMode: mode,
               onChanged: (m) => ref.read(semesterProvider.notifier).setMode(m),
-            ).animate().fadeIn(duration: 300.ms),
+            ),
             const SizedBox(height: 24),
             HeroGpaCard(
               gpa: mode == CalculationMode.cgpa
@@ -121,18 +127,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   : 'SEMESTER GPA',
               totalCredits: stats.totalCredits,
               courseCount: semester.courses.length,
-            ).animate().fadeIn(delay: 100.ms, duration: 400.ms)
-                .slideY(begin: 0.1, end: 0),
-            const SizedBox(height: 28),
-            Text(
-              mode == CalculationMode.cgpa ? 'SEMESTERS' : 'COURSES',
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: AppTheme.textMuted,
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w800,
-              ),
             ),
+            const SizedBox(height: 28),
+            const Text('SEMESTERS', style: _sectionLabelStyle),
             const SizedBox(height: 16),
             if (mode == CalculationMode.cgpa) ...[
               if (cgpaState.semesters.isEmpty)
@@ -142,14 +139,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   subtitle: 'Add your first semester to start calculating',
                 )
               else
-                ...cgpaState.semesters.asMap().entries.map((entry) {
+                ...cgpaState.semesters.map((entry) {
                   return SemesterCard(
-                    key: ValueKey(entry.value.id),
-                    semester: entry.value,
-                  ).animate().fadeIn(
-                        delay: Duration(milliseconds: 50 * entry.key),
-                        duration: 300.ms,
-                      ).slideY(begin: 0.05, end: 0);
+                    key: ValueKey(entry.id),
+                    semester: entry,
+                  );
                 }),
             ] else ...[
               if (semester.courses.isEmpty)
@@ -159,14 +153,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   subtitle: 'Add your first course to start calculating',
                 )
               else
-                ...semester.courses.asMap().entries.map((entry) {
+                ...semester.courses.map((entry) {
                   return CourseInputCard(
-                    key: ValueKey(entry.value.id),
-                    course: entry.value,
-                  ).animate().fadeIn(
-                        delay: Duration(milliseconds: 50 * entry.key),
-                        duration: 300.ms,
-                      ).slideY(begin: 0.05, end: 0);
+                    key: ValueKey(entry.id),
+                    course: entry,
+                  );
                 }),
             ],
             const SizedBox(height: 24),
@@ -180,14 +171,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.add_rounded, color: Colors.white),
-                  const SizedBox(width: 8),
+                children: const [
+                  Icon(Icons.add_rounded, color: Colors.white),
+                  SizedBox(width: 8),
                   Text(
-                    mode == CalculationMode.cgpa
-                        ? 'ADD SEMESTER'
-                        : 'ADD COURSE',
-                    style: GoogleFonts.inter(
+                    'ADD',
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1,
@@ -195,23 +184,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-            ).animate().fadeIn(delay: 200.ms, duration: 300.ms),
+            ),
             const SizedBox(height: 32),
             Center(
               child: Column(
-                children: [
+                children: const [
                   Text(
                     'Developed by',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 10,
                       color: AppTheme.textMuted,
                       letterSpacing: 2,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     'JIBRAN KHAN DEHPAL',
-                    style: GoogleFonts.inter(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.textSecondary,
