@@ -2,50 +2,79 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryCyan = Color(0xFF00E5FF);
-  static const Color primaryIndigo = Color(0xFF3F51B5);
-  static const Color backgroundDark = Color(0xFF0A0E21);
-  static const Color surfaceGlass = Color(0x1AFFFFFF);
-  static const Color accentAmber = Color(0xFFFFC107);
-  static const Color errorRed = Color(0xFFFF5252);
-  static const Color successGreen = Color(0xFF4CAF50);
+  // Background
+  static const Color bgPrimary = Color(0xFF0A0E1A);
+  static const Color bgGradientStart = Color(0xFF0F172A);
+
+  // Surface
+  static const Color surfaceGlass = Color(0x0FFFFFFF); // white 6%
+  static const Color borderGlass = Color(0x1AFFFFFF); // white 10%
+
+  // Accents
+  static const Color accentPrimary = Color(0xFF6366F1);
+  static const Color accentSecondary = Color(0xFFA855F7);
+
+  // Semantic
+  static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color danger = Color(0xFFEF4444);
+
+  // Text
+  static const Color textPrimary = Color(0xFFF8FAFC);
+  static const Color textSecondary = Color(0xFF94A3B8);
+  static const Color textMuted = Color(0xFF475569);
 
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: backgroundDark,
+    scaffoldBackgroundColor: bgPrimary,
     colorScheme: const ColorScheme.dark(
-      primary: primaryCyan,
-      secondary: primaryIndigo,
-      surface: backgroundDark,
-      error: errorRed,
+      primary: accentPrimary,
+      secondary: accentSecondary,
+      surface: bgPrimary,
+      error: danger,
     ),
     textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
       displayLarge: GoogleFonts.lexend(
-        fontSize: 32,
+        fontSize: 56,
         fontWeight: FontWeight.bold,
-        color: Colors.white,
+        color: textPrimary,
       ),
       displayMedium: GoogleFonts.lexend(
+        fontSize: 48,
+        fontWeight: FontWeight.bold,
+        color: textPrimary,
+      ),
+      headlineMedium: GoogleFonts.lexend(
         fontSize: 24,
         fontWeight: FontWeight.w600,
-        color: Colors.white,
+        color: textPrimary,
       ),
       titleLarge: GoogleFonts.lexend(
         fontSize: 20,
         fontWeight: FontWeight.w500,
-        color: Colors.white,
+        color: textPrimary,
       ),
-      bodyLarge: GoogleFonts.inter(fontSize: 16, color: Colors.white70),
-      bodyMedium: GoogleFonts.inter(fontSize: 14, color: Colors.white60),
-    ),
-    dropdownMenuTheme: DropdownMenuThemeData(
-      textStyle: GoogleFonts.inter(color: Colors.white),
-      menuStyle: MenuStyle(
-        backgroundColor: WidgetStateProperty.all(
-          backgroundDark.withValues(alpha: 0.9),
-        ),
+      bodyLarge: GoogleFonts.inter(fontSize: 16, color: textPrimary),
+      bodyMedium: GoogleFonts.inter(fontSize: 14, color: textSecondary),
+      labelLarge: GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: textPrimary,
+        letterSpacing: 1.0,
+      ),
+      labelSmall: GoogleFonts.inter(
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        color: textMuted,
+        letterSpacing: 1.5,
       ),
     ),
   );
+
+  static Color getGpaColor(double gpa) {
+    if (gpa >= 3.5) return success;
+    if (gpa >= 2.5) return warning;
+    return danger;
+  }
 }
