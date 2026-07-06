@@ -23,10 +23,12 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   late TextEditingController _midController;
   late TextEditingController _finalController;
   late TextEditingController _sessionalController;
+  late TextEditingController _totalController;
   late FocusNode _nameFocus;
   late FocusNode _midFocus;
   late FocusNode _finalFocus;
   late FocusNode _sessionalFocus;
+  late FocusNode _totalFocus;
 
   SemesterNotifier get _notifier =>
       widget.notifierOverride ?? ref.read(semesterProvider.notifier);
@@ -44,11 +46,15 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     _sessionalController = TextEditingController(
       text: widget.course.sessionalMarks == 0 ? '' : widget.course.sessionalMarks.toStringAsFixed(0),
     );
+    _totalController = TextEditingController(
+      text: widget.course.totalMarks == 0 ? '' : widget.course.totalMarks.toStringAsFixed(0),
+    );
 
     _nameFocus = FocusNode();
     _midFocus = FocusNode();
     _finalFocus = FocusNode();
     _sessionalFocus = FocusNode();
+    _totalFocus = FocusNode();
 
     _setupFocusListeners();
   }
@@ -66,6 +72,18 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     _midFocus.addListener(() => _onMarksFocusLost('mid'));
     _finalFocus.addListener(() => _onMarksFocusLost('final'));
     _sessionalFocus.addListener(() => _onMarksFocusLost('sessional'));
+    _totalFocus.addListener(() {
+      if (!_totalFocus.hasFocus) {
+        double val = double.tryParse(_totalController.text) ?? 0;
+        if (val > 100) val = 100;
+        if (val != widget.course.totalMarks) {
+          _notifier.updateCourse(
+            widget.course.id,
+            totalMarks: val,
+          );
+        }
+      }
+    });
   }
 
   void _onMarksFocusLost(String type) {
@@ -123,6 +141,9 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     if (oldWidget.course.sessionalMarks != widget.course.sessionalMarks && !_sessionalFocus.hasFocus) {
       _sessionalController.text = widget.course.sessionalMarks == 0 ? '' : widget.course.sessionalMarks.toStringAsFixed(0);
     }
+    if (oldWidget.course.totalMarks != widget.course.totalMarks && !_totalFocus.hasFocus) {
+      _totalController.text = widget.course.totalMarks == 0 ? '' : widget.course.totalMarks.toStringAsFixed(0);
+    }
   }
 
   @override
@@ -131,10 +152,12 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     _midFocus.dispose();
     _finalFocus.dispose();
     _sessionalFocus.dispose();
+    _totalFocus.dispose();
     _nameController.dispose();
     _midController.dispose();
     _finalController.dispose();
     _sessionalController.dispose();
+    _totalController.dispose();
     super.dispose();
   }
 
@@ -367,7 +390,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     ],
                   ),
                   const SizedBox(width: 16),
-                  // Total
+                  // Total (editable)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -382,7 +405,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                       ),
                       const SizedBox(height: 4),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppTheme.accentPrimary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
@@ -390,12 +413,35 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                             color: AppTheme.accentPrimary.withValues(alpha: 0.2),
                           ),
                         ),
-                        child: Text(
-                          widget.course.totalMarks.toStringAsFixed(0),
-                          style: const TextStyle(
-                            color: AppTheme.accentPrimary,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
+                        child: SizedBox(
+                          width: 42,
+                          child: TextField(
+                            controller: _totalController,
+                            focusNode: _totalFocus,
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppTheme.accentPrimary,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: '0',
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(vertical: 6),
+                              hintStyle: TextStyle(color: AppTheme.textMuted),
+                            ),
+                            onChanged: (val) {
+                              double d = double.tryParse(val) ?? 0;
+                              if (d > 100) {
+                                d = 100;
+                                _totalController.text = '100';
+                                _totalController.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: _totalController.text.length),
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
