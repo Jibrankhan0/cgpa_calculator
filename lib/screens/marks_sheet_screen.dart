@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/semester_provider.dart';
 import '../services/gpa_service.dart';
+import '../services/pdf_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/mesh_gradient_background.dart';
 import '../widgets/glass_card.dart';
@@ -84,6 +85,22 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.picture_as_pdf_rounded,
+              color: AppTheme.danger,
+            ),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              final stats = ref.read(marksStatsProvider);
+              PdfService.generateMarksSheet(
+                semesters: semesterState.semesters,
+                overallCGPA: stats.cgpa.toStringAsFixed(2),
+              );
+            },
+            tooltip: 'Download PDF',
+          ),
+          const SizedBox(width: 4),
           TextButton.icon(
             onPressed: () {
               HapticFeedback.lightImpact();
