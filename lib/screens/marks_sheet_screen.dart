@@ -316,7 +316,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      'Yahan apnay har course k marks save karein. Yeh data GPA calculate karnay k liye use hoga.',
+                                      'Store your course marks here. This data will be used to calculate GPA.',
                                       style: GoogleFonts.inter(
                                         fontSize: 11,
                                         color: AppTheme.textSecondary,
