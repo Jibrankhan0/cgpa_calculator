@@ -10,8 +10,9 @@ import 'grade_badge.dart';
 
 class CourseInputCard extends ConsumerStatefulWidget {
   final Course course;
+  final SemesterNotifier? notifierOverride;
 
-  const CourseInputCard({super.key, required this.course});
+  const CourseInputCard({super.key, required this.course, this.notifierOverride});
 
   @override
   ConsumerState<CourseInputCard> createState() => _CourseInputCardState();
@@ -26,6 +27,9 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   late FocusNode _midFocus;
   late FocusNode _finalFocus;
   late FocusNode _sessionalFocus;
+
+  SemesterNotifier get _notifier =>
+      widget.notifierOverride ?? ref.read(semesterProvider.notifier);
 
   @override
   void initState() {
@@ -52,7 +56,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   void _setupFocusListeners() {
     _nameFocus.addListener(() {
       if (!_nameFocus.hasFocus && _nameController.text != widget.course.name) {
-        ref.read(semesterProvider.notifier).updateCourse(
+        _notifier.updateCourse(
               widget.course.id,
               name: _nameController.text,
             );
@@ -81,21 +85,21 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
 
     switch (type) {
       case 'mid':
-        ref.read(semesterProvider.notifier).updateCourse(
+        _notifier.updateCourse(
               widget.course.id,
               midMarks: val,
               totalMarks: val + widget.course.finalMarks + widget.course.sessionalMarks,
             );
         break;
       case 'final':
-        ref.read(semesterProvider.notifier).updateCourse(
+        _notifier.updateCourse(
               widget.course.id,
               finalMarks: val,
               totalMarks: widget.course.midMarks + val + widget.course.sessionalMarks,
             );
         break;
       case 'sessional':
-        ref.read(semesterProvider.notifier).updateCourse(
+        _notifier.updateCourse(
               widget.course.id,
               sessionalMarks: val,
               totalMarks: widget.course.midMarks + widget.course.finalMarks + val,
@@ -211,7 +215,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    ref.read(semesterProvider.notifier).updateCourse(
+                    _notifier.updateCourse(
                           widget.course.id,
                           isPractical: !isLab,
                           creditHours: !isLab ? 1.0 : widget.course.creditHours,
@@ -350,7 +354,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                               }).toList(),
                               onChanged: (val) {
                                 if (val != null) {
-                                  ref.read(semesterProvider.notifier).updateCourse(
+                                  _notifier.updateCourse(
                                         widget.course.id,
                                         creditHours: val,
                                       );
@@ -409,7 +413,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                   ),
                   onPressed: () {
                     HapticFeedback.mediumImpact();
-                    ref.read(semesterProvider.notifier).removeCourse(
+                    _notifier.removeCourse(
                           widget.course.id,
                         );
                   },

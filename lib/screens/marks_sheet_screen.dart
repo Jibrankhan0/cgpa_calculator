@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/semester_provider.dart';
 import '../services/gpa_service.dart';
+import '../theme/app_theme.dart';
 import '../widgets/mesh_gradient_background.dart';
 import '../widgets/glass_card.dart';
+import '../widgets/course_input_card.dart';
+import '../widgets/empty_state.dart';
+
 
 class MarksSheetScreen extends ConsumerStatefulWidget {
   const MarksSheetScreen({super.key});
@@ -34,8 +40,8 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
   @override
   Widget build(BuildContext context) {
     final semesterState = ref.watch(marksSheetProvider);
+    final stats = ref.watch(marksStatsProvider);
 
-    // Efficiently update/recreate TabController when semesters count changes or on first build
     if (_tabController == null ||
         _tabController!.length != semesterState.semesters.length) {
       final oldIndex = _tabController?.index ?? semesterState.selectedIndex;
@@ -53,22 +59,29 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
         }
       });
     } else if (_tabController!.index != semesterState.selectedIndex) {
-      // Sync controller if provider state changed externally
       _tabController!.animateTo(semesterState.selectedIndex);
     }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'Marks Sheet',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: AppTheme.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: Text(
+          'Marks Sheet',
+          style: GoogleFonts.lexend(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textPrimary,
+          ),
         ),
         actions: [
           TextButton.icon(
@@ -77,40 +90,42 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text(
+                  content: Text(
                     'Data Saved Locally',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  backgroundColor: Colors.cyanAccent,
+                  backgroundColor: AppTheme.accentPrimary,
                   duration: const Duration(seconds: 1),
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
               );
             },
             icon: const Icon(
               Icons.check_circle_outline_rounded,
-              color: Colors.cyanAccent,
+              color: AppTheme.accentPrimary,
               size: 20,
             ),
-            label: const Text(
+            label: Text(
               'SAVE',
-              style: TextStyle(
-                color: Colors.cyanAccent,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.inter(
+                color: AppTheme.accentPrimary,
+                fontWeight: FontWeight.w800,
+                fontSize: 12,
+                letterSpacing: 0.5,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           IconButton(
             icon: const Icon(
               Icons.add_to_photos_rounded,
-              color: Colors.cyanAccent,
+              color: AppTheme.accentPrimary,
             ),
             onPressed: () {
               ref.read(marksSheetProvider.notifier).addSemester();
@@ -125,25 +140,37 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
             : TabBar(
                 controller: _tabController,
                 isScrollable: true,
-                indicatorColor: Colors.cyanAccent,
-                labelColor: Colors.cyanAccent,
-                unselectedLabelColor: Colors.white38,
+                indicatorColor: AppTheme.accentPrimary,
+                labelColor: AppTheme.accentPrimary,
+                unselectedLabelColor: AppTheme.textMuted,
+                indicatorWeight: 3,
+                labelStyle: GoogleFonts.lexend(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+                unselectedLabelStyle: GoogleFonts.lexend(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
                 tabs: semesterState.semesters
-                    .map((s) => Tab(text: s.name))
+                    .map((s) => Tab(text: s.name.toUpperCase()))
                     .toList(),
               ),
       ),
       body: MeshGradientBackground(
         child: semesterState.semesters.isEmpty
-            ? const Center(
-                child: Text(
-                  'No semesters added',
-                  style: TextStyle(color: Colors.white38),
+            ? const Padding(
+                padding: EdgeInsets.only(top: 120),
+                child: EmptyState(
+                  icon: Icons.school_outlined,
+                  title: 'No semesters yet',
+                  subtitle: 'Tap + to add your first semester',
                 ),
               )
             : TabBarView(
                 controller: _tabController,
                 children: semesterState.semesters.map((semester) {
+                  final semesterGpa = _calculateSemesterGpa(semester);
                   return SingleChildScrollView(
                     padding: const EdgeInsets.only(
                       top: 100,
@@ -152,276 +179,218 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                       bottom: 100,
                     ),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      semester.name,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.cyanAccent,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    if (semesterState.semesters.length > 1)
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.delete_forever_rounded,
-                                          color: Colors.redAccent,
-                                          size: 20,
-                                        ),
-                                        onPressed: () {
-                                          _showDeleteSemesterDialog(
-                                            context,
-                                            semester.name,
-                                          );
-                                        },
-                                        tooltip: 'Delete Semester',
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.info_outline,
-                                      size: 14,
-                                      color: Colors.white38,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${semester.courses.length} Courses  •  ',
-                                      style: const TextStyle(
-                                        color: Colors.white38,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      'GPA: ${_calculateSemesterGpa(semester).toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        color: Colors.cyanAccent,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            // Overall CGPA Indicator
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  'OVERALL CGPA',
-                                  style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                Text(
-                                  ref
-                                      .watch(marksStatsProvider)
-                                      .cgpa
-                                      .toStringAsFixed(2),
-                                  style: const TextStyle(
-                                    color: Colors.cyanAccent,
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
                         GlassCard(
-                          padding: EdgeInsets.zero,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columnSpacing: 20, // Reduced for extra column
-                              headingTextStyle: const TextStyle(
-                                color: Colors.cyanAccent,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                              dataTextStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                              ),
-                              columns: const [
-                                DataColumn(label: Text('COURSE')),
-                                DataColumn(label: Text('CR')),
-                                DataColumn(label: Text('MID')),
-                                DataColumn(label: Text('FIN.')),
-                                DataColumn(label: Text('SES.')),
-                                DataColumn(label: Text('TOT.')),
-                                DataColumn(label: Text('G')),
-                                DataColumn(label: Text('')),
-                              ],
-                              rows: semester.courses.map((course) {
-                                return DataRow(
-                                  cells: [
-                                    DataCell(
-                                      _CourseNameCell(
-                                        name: course.name,
-                                        onChanged: (val) => ref
-                                            .read(marksSheetProvider.notifier)
-                                            .updateCourse(course.id, name: val),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      _CreditCell(
-                                        credits: course.creditHours,
-                                        onChanged: (val) => ref
-                                            .read(marksSheetProvider.notifier)
-                                            .updateCourse(
-                                              course.id,
-                                              creditHours: val,
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            semester.name,
+                                            style: GoogleFonts.lexend(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppTheme.textPrimary,
                                             ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      _EditableCell(
-                                        value: course.midMarks,
-                                        onChanged: (val) {
-                                          final newTotal =
-                                              val +
-                                              course.finalMarks +
-                                              course.sessionalMarks;
-                                          ref
-                                              .read(marksSheetProvider.notifier)
-                                              .updateCourse(
-                                                course.id,
-                                                midMarks: val,
-                                                totalMarks: newTotal,
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                    DataCell(
-                                      _EditableCell(
-                                        value: course.finalMarks,
-                                        onChanged: (val) {
-                                          final newTotal =
-                                              course.midMarks +
-                                              val +
-                                              course.sessionalMarks;
-                                          ref
-                                              .read(marksSheetProvider.notifier)
-                                              .updateCourse(
-                                                course.id,
-                                                finalMarks: val,
-                                                totalMarks: newTotal,
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                    DataCell(
-                                      _EditableCell(
-                                        value: course.sessionalMarks,
-                                        onChanged: (val) {
-                                          final newTotal =
-                                              course.midMarks +
-                                              course.finalMarks +
-                                              val;
-                                          ref
-                                              .read(marksSheetProvider.notifier)
-                                              .updateCourse(
-                                                course.id,
-                                                sessionalMarks: val,
-                                                totalMarks: newTotal,
-                                              );
-                                        },
-                                      ),
-                                    ),
-                                    DataCell(
-                                      _EditableCell(
-                                        value: course.totalMarks,
-                                        isTotal: true,
-                                        onChanged: (val) => ref
-                                            .read(marksSheetProvider.notifier)
-                                            .updateCourse(
-                                              course.id,
-                                              totalMarks: val,
-                                            ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      _GradeCell(
-                                        grade: course.grade,
-                                        onChanged: (val) => ref
-                                            .read(marksSheetProvider.notifier)
-                                            .updateCourse(
-                                              course.id,
-                                              grade: val,
-                                            ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.delete_outline_rounded,
-                                          color: Colors.redAccent,
-                                          size: 20,
+                                          ),
                                         ),
-                                        onPressed: () {
-                                          ref
-                                              .read(marksSheetProvider.notifier)
-                                              .removeCourse(course.id);
-                                          HapticFeedback.mediumImpact();
-                                        },
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(),
-                                        visualDensity: VisualDensity.compact,
-                                      ),
+                                        if (semesterState.semesters.length > 1)
+                                          IconButton(
+                                            icon: const Icon(
+                                              Icons.delete_outline_rounded,
+                                              color: AppTheme.danger,
+                                              size: 20,
+                                            ),
+                                            onPressed: () =>
+                                                _showDeleteSemesterDialog(
+                                              context,
+                                              semester.name,
+                                            ),
+                                            tooltip: 'Delete Semester',
+                                            padding: EdgeInsets.zero,
+                                            constraints:
+                                                const BoxConstraints(),
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.info_outline,
+                                          size: 14,
+                                          color: AppTheme.textMuted,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${semester.courses.length} Courses  •  ',
+                                          style: GoogleFonts.inter(
+                                            color: AppTheme.textSecondary,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        Text(
+                                          'GPA: ${semesterGpa.toStringAsFixed(2)}',
+                                          style: GoogleFonts.inter(
+                                            color: AppTheme.accentPrimary,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
-                                );
-                              }).toList(),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    'OVERALL CGPA',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.textMuted,
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                  Text(
+                                    stats.cgpa.toStringAsFixed(2),
+                                    style: GoogleFonts.lexend(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          AppTheme.getGpaColor(stats.cgpa),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ).animate().fadeIn(duration: 300.ms),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.accentPrimary
+                                .withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppTheme.accentPrimary
+                                  .withValues(alpha: 0.15),
                             ),
                           ),
-                        ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.storage_rounded,
+                                color: AppTheme.accentPrimary,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Marks Sheet — Data Store',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppTheme.textPrimary,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Yahan apnay har course k marks save karein. Yeh data GPA calculate karnay k liye use hoga.',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: AppTheme.textSecondary,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).animate().fadeIn(
+                              delay: 100.ms,
+                              duration: 300.ms,
+                            ),
+                        const SizedBox(height: 16),
+                        if (semester.courses.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 40),
+                            child: EmptyState(
+                              icon: Icons.book_outlined,
+                              title: 'No courses yet',
+                              subtitle:
+                                  'Tap + to add your first course',
+                            ),
+                          )
+                        else
+                          ...semester.courses
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            return CourseInputCard(
+                              key: ValueKey(entry.value.id),
+                              course: entry.value,
+                              notifierOverride:
+                                  ref.read(marksSheetProvider.notifier),
+                            )
+                                .animate()
+                                .fadeIn(
+                                  delay: Duration(
+                                      milliseconds: 40 * entry.key),
+                                  duration: 300.ms,
+                                )
+                                .slideY(begin: 0.03, end: 0);
+                          }),
                       ],
                     ),
                   );
                 }).toList(),
               ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          final idx = _tabController?.index ?? 0;
-          ref.read(marksSheetProvider.notifier).addCourse(idx);
-          HapticFeedback.lightImpact();
-        },
-        backgroundColor: Colors.cyanAccent.withOpacity(0.2),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.cyanAccent.withOpacity(0.5)),
-        ),
-        icon: const Icon(Icons.add_rounded, color: Colors.cyanAccent),
-        label: const Text(
-          'ADD COURSE',
-          style: TextStyle(
-            color: Colors.cyanAccent,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      floatingActionButton: semesterState.semesters.isEmpty
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () {
+                final idx = _tabController?.index ?? 0;
+                ref.read(marksSheetProvider.notifier).addCourse(idx);
+                HapticFeedback.lightImpact();
+              },
+              backgroundColor: AppTheme.accentPrimary,
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              label: Text(
+                'ADD COURSE',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ),
     );
   }
 
@@ -440,21 +409,33 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1F3D),
+        backgroundColor: AppTheme.bgGradientStart,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: AppTheme.borderGlass),
+        ),
         title: Text(
           'Delete $semesterName?',
-          style: const TextStyle(color: Colors.white),
+          style: GoogleFonts.lexend(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        content: const Text(
+        content: Text(
           'This will permanently remove all courses and marks for this semester.',
-          style: TextStyle(color: Colors.white70),
+          style: GoogleFonts.inter(
+            color: AppTheme.textSecondary,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
+            child: Text(
               'CANCEL',
-              style: TextStyle(color: Colors.white38),
+              style: GoogleFonts.inter(
+                color: AppTheme.textMuted,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           TextButton(
@@ -464,256 +445,16 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               Navigator.pop(context);
               HapticFeedback.heavyImpact();
             },
-            child: const Text(
+            child: Text(
               'DELETE',
-              style: TextStyle(
-                color: Colors.redAccent,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.inter(
+                color: AppTheme.danger,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _EditableCell extends StatefulWidget {
-  final double value;
-  final bool isTotal;
-  final Function(double) onChanged;
-
-  const _EditableCell({
-    required this.value,
-    this.isTotal = false,
-    required this.onChanged,
-  });
-
-  @override
-  State<_EditableCell> createState() => _EditableCellState();
-}
-
-class _EditableCellState extends State<_EditableCell> {
-  late TextEditingController _controller;
-  late FocusNode _focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(
-      text: widget.value == 0
-          ? ''
-          : widget.value.toString().replaceAll('.0', ''),
-    );
-    _focusNode = FocusNode();
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus) {
-        final d = double.tryParse(_controller.text) ?? 0;
-        if (d != widget.value) {
-          widget.onChanged(d);
-        }
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant _EditableCell oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.value != widget.value && !_focusNode.hasFocus) {
-      final text = widget.value == 0
-          ? ''
-          : widget.value.toString().replaceAll('.0', '');
-      if (text != _controller.text) {
-        _controller.text = text;
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      child: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
-        keyboardType: TextInputType.number,
-        style: TextStyle(
-          fontSize: 13,
-          color: widget.isTotal ? Colors.cyanAccent : Colors.white,
-          fontWeight: widget.isTotal ? FontWeight.bold : FontWeight.normal,
-        ),
-        decoration: InputDecoration(
-          hintText: '0',
-          hintStyle: const TextStyle(color: Colors.white24),
-          border: InputBorder.none,
-          isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 8),
-        ),
-        onSubmitted: (val) {
-          final d = double.tryParse(val) ?? 0;
-          widget.onChanged(d);
-        },
-      ),
-    );
-  }
-}
-
-class _CourseNameCell extends StatefulWidget {
-  final String name;
-  final Function(String) onChanged;
-
-  const _CourseNameCell({required this.name, required this.onChanged});
-
-  @override
-  State<_CourseNameCell> createState() => _CourseNameCellState();
-}
-
-class _CourseNameCellState extends State<_CourseNameCell> {
-  late TextEditingController _controller;
-  late FocusNode _focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.name);
-    _focusNode = FocusNode();
-    _focusNode.addListener(() {
-      if (!_focusNode.hasFocus && _controller.text != widget.name) {
-        widget.onChanged(_controller.text);
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant _CourseNameCell oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.name != widget.name && !_focusNode.hasFocus) {
-      if (widget.name != _controller.text) {
-        _controller.text = widget.name;
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 120,
-      child: TextField(
-        controller: _controller,
-        focusNode: _focusNode,
-        style: TextStyle(
-          fontSize: 13,
-          color: widget.name.isEmpty ? Colors.white38 : Colors.white,
-          fontStyle: widget.name.isEmpty ? FontStyle.italic : FontStyle.normal,
-        ),
-        decoration: const InputDecoration(
-          hintText: 'Course Name',
-          hintStyle: TextStyle(
-            color: Colors.white24,
-            fontStyle: FontStyle.italic,
-          ),
-          border: InputBorder.none,
-          isDense: true,
-          contentPadding: EdgeInsets.symmetric(vertical: 8),
-        ),
-        onSubmitted: (val) {
-          widget.onChanged(val);
-        },
-      ),
-    );
-  }
-}
-
-class _GradeCell extends StatelessWidget {
-  final String grade;
-  final Function(String) onChanged;
-
-  const _GradeCell({required this.grade, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      child: DropdownButton<String>(
-        value: grade,
-        dropdownColor: const Color(0xFF1A1F3D),
-        underline: const SizedBox(),
-        isExpanded: true,
-        isDense: true,
-        icon: const Icon(Icons.arrow_drop_down, size: 16),
-        alignment: Alignment.center,
-        items: GpaService.grades.map((e) {
-          return DropdownMenuItem(
-            value: e,
-            child: Center(
-              child: Text(
-                e,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.cyanAccent,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-        onChanged: (val) {
-          if (val != null) {
-            onChanged(val);
-            HapticFeedback.selectionClick();
-          }
-        },
-      ),
-    );
-  }
-}
-
-class _CreditCell extends StatelessWidget {
-  final double credits;
-  final ValueChanged<double> onChanged;
-
-  const _CreditCell({required this.credits, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<double>(
-      value: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0].contains(credits) ? credits : 3.0,
-      dropdownColor: const Color(0xFF1A1F3D),
-      underline: const SizedBox(),
-      isDense: true,
-      icon: const Icon(
-        Icons.arrow_drop_down,
-        size: 14,
-        color: Colors.cyanAccent,
-      ),
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-      ),
-      items: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0].map((e) {
-        return DropdownMenuItem(value: e, child: Text('${e.toInt()}'));
-      }).toList(),
-      onChanged: (val) {
-        if (val != null) {
-          onChanged(val);
-          HapticFeedback.selectionClick();
-        }
-      },
     );
   }
 }
