@@ -105,7 +105,7 @@ class _RingPainter extends CustomPainter {
 
     // Background track
     final bgPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.1)
+      ..color = const Color(0x1AFFFFFF)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;

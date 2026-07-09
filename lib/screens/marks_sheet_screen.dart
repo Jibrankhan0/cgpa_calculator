@@ -38,17 +38,22 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
 
   @override
   Widget build(BuildContext context) {
-    final semesterState = ref.watch(marksSheetProvider);
+    final semesterSemesters = ref.watch(
+      marksSheetProvider.select((s) => s.semesters),
+    );
+    final semesterSelectedIndex = ref.watch(
+      marksSheetProvider.select((s) => s.selectedIndex),
+    );
     final stats = ref.watch(marksStatsProvider);
 
     if (_tabController == null ||
-        _tabController!.length != semesterState.semesters.length) {
-      final oldIndex = _tabController?.index ?? semesterState.selectedIndex;
+        _tabController!.length != semesterSemesters.length) {
+      final oldIndex = _tabController?.index ?? semesterSelectedIndex;
       _tabController?.dispose();
       _tabController = TabController(
-        length: semesterState.semesters.length,
+        length: semesterSemesters.length,
         vsync: this,
-        initialIndex: oldIndex.clamp(0, semesterState.semesters.length - 1),
+        initialIndex: oldIndex.clamp(0, semesterSemesters.length - 1),
       );
       _tabController!.addListener(() {
         if (!_tabController!.indexIsChanging) {
@@ -57,8 +62,8 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               .selectSemester(_tabController!.index);
         }
       });
-    } else if (_tabController!.index != semesterState.selectedIndex) {
-      _tabController!.animateTo(semesterState.selectedIndex);
+    } else if (_tabController!.index != semesterSelectedIndex) {
+      _tabController!.animateTo(semesterSelectedIndex);
     }
 
     return Scaffold(
@@ -92,7 +97,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               HapticFeedback.lightImpact();
               final stats = ref.read(marksStatsProvider);
               PdfService.generateMarksSheet(
-                semesters: semesterState.semesters,
+                semesters: semesterSemesters,
                 overallCGPA: stats.cgpa.toStringAsFixed(2),
               );
             },
@@ -150,7 +155,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
           ),
           const SizedBox(width: 8),
         ],
-        bottom: semesterState.semesters.isEmpty
+        bottom: semesterSemesters.isEmpty
             ? null
             : TabBar(
                 controller: _tabController,
@@ -167,13 +172,13 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
                 ),
-                tabs: semesterState.semesters
+                tabs: semesterSemesters
                     .map((s) => Tab(text: s.name.toUpperCase()))
                     .toList(),
               ),
       ),
       body: MeshGradientBackground(
-        child: semesterState.semesters.isEmpty
+        child: semesterSemesters.isEmpty
             ? const Padding(
                 padding: EdgeInsets.only(top: 120),
                 child: EmptyState(
@@ -184,7 +189,8 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               )
             : TabBarView(
                 controller: _tabController,
-                children: semesterState.semesters.map((semester) {
+                children: List.generate(semesterSemesters.length, (index) {
+                  final semester = semesterSemesters[index];
                   final semesterGpa = _calculateSemesterGpa(semester);
                   return SingleChildScrollView(
                     padding: const EdgeInsets.only(
@@ -216,7 +222,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                             ),
                                           ),
                                         ),
-                                        if (semesterState.semesters.length > 1)
+                                        if (semesterSemesters.length > 1)
                                           IconButton(
                                             icon: const Icon(
                                               Icons.delete_outline_rounded,
@@ -368,10 +374,10 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                       ],
                     ),
                   );
-                }).toList(),
+                }),
               ),
       ),
-      floatingActionButton: semesterState.semesters.isEmpty
+      floatingActionButton: semesterSemesters.isEmpty
           ? null
           : FloatingActionButton.extended(
               onPressed: () {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,6 +54,7 @@ final semesterProvider = NotifierProvider<SemesterNotifier, SemesterState>(() {
 
 class SemesterNotifier extends Notifier<SemesterState> {
   String get storageKey => 'semester_cache_v1';
+  Timer? _saveTimer;
 
   @override
   SemesterState build() {
@@ -82,12 +84,17 @@ class SemesterNotifier extends Notifier<SemesterState> {
       if (data != null) {
         state = SemesterState.fromJson(jsonDecode(data));
       }
-    } catch (e) {}
+    } catch (e) {
+      print('Error loading from local: $e');
+    }
   }
 
-  Future<void> _save() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(storageKey, jsonEncode(state.toJson()));
+  void _save() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 500), () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(storageKey, jsonEncode(state.toJson()));
+    });
   }
 
   void setMode(CalculationMode mode) {
@@ -201,21 +208,23 @@ class SemesterNotifier extends Notifier<SemesterState> {
           courses: sem.courses.map((c) {
             if (c.id == courseId) {
               String? newGrade = grade;
-              double? newMid = midMarks;
-              double? newFinal = finalMarks;
-              double? newSessional = sessionalMarks;
-              double? newTotal = totalMarks;
+              double? newMid = midMarks != null ? midMarks.clamp(0.0, 100.0) : null;
+              double? newFinal = finalMarks != null ? finalMarks.clamp(0.0, 100.0) : null;
+              double? newSessional = sessionalMarks != null ? sessionalMarks.clamp(0.0, 100.0) : null;
+              double? newTotal = totalMarks != null ? totalMarks.clamp(0.0, 100.0) : null;
 
               if (totalMarks != null ||
                   midMarks != null ||
                   finalMarks != null ||
                   sessionalMarks != null ||
                   isPractical != null) {
-                final calculatedTotal =
-                    totalMarks ??
-                    ((midMarks ?? c.midMarks) +
-                        (finalMarks ?? c.finalMarks) +
-                        (sessionalMarks ?? c.sessionalMarks));
+                final calculatedTotal = (
+                    newTotal ??
+                    ((newMid ?? c.midMarks) +
+                        (newFinal ?? c.finalMarks) +
+                        (newSessional ?? c.sessionalMarks))
+                ).clamp(0.0, 100.0);
+                newTotal = calculatedTotal;
                 newGrade = GpaService.getGradeFromMarks(
                   calculatedTotal,
                   isPractical: isPractical ?? c.isPractical,
@@ -224,7 +233,7 @@ class SemesterNotifier extends Notifier<SemesterState> {
                 newTotal = GpaService.getRepresentativeMarks(
                   grade,
                   isPractical: isPractical ?? c.isPractical,
-                );
+                ).clamp(0.0, 100.0);
                 newMid = 0;
                 newFinal = 0;
                 newSessional = 0;
@@ -278,6 +287,7 @@ final cgpaProvider = NotifierProvider<CgpaNotifier, CgpaState>(() {
 
 class CgpaNotifier extends Notifier<CgpaState> {
   String get storageKey => 'cgpa_cache_v1';
+  Timer? _saveTimer;
 
   @override
   CgpaState build() {
@@ -300,12 +310,17 @@ class CgpaNotifier extends Notifier<CgpaState> {
       if (data != null) {
         state = CgpaState.fromJson(jsonDecode(data));
       }
-    } catch (e) {}
+    } catch (e) {
+      print('Error loading from local: $e');
+    }
   }
 
-  Future<void> _save() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(storageKey, jsonEncode(state.toJson()));
+  void _save() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 500), () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(storageKey, jsonEncode(state.toJson()));
+    });
   }
 
   void addSemester() {
@@ -351,10 +366,15 @@ class CgpaNotifier extends Notifier<CgpaState> {
     double? creditHours,
     double? gpa,
   }) {
+    final double? clampedGpa = gpa != null ? gpa.clamp(0.0, 4.0) : null;
     state = state.copyWith(
       semesters: state.semesters.map((s) {
         if (s.id == id) {
-          return s.copyWith(name: name, creditHours: creditHours, gpa: gpa);
+          return s.copyWith(
+            name: name,
+            creditHours: creditHours,
+            gpa: clampedGpa,
+          );
         }
         return s;
       }).toList(),

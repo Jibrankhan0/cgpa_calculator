@@ -43,7 +43,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final semester = ref.watch(
       semesterProvider.select((s) => s.semesters[selectedIndex]),
     );
-    final cgpaState = ref.watch(cgpaProvider);
+    final cgpaSemesters = ref.watch(
+      cgpaProvider.select((s) => s.semesters),
+    );
     final stats = ref.watch(gpaStatsProvider);
 
     return Scaffold(
@@ -132,14 +134,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const Text('SEMESTERS', style: _sectionLabelStyle),
             const SizedBox(height: 16),
             if (mode == CalculationMode.cgpa) ...[
-              if (cgpaState.semesters.isEmpty)
+              if (cgpaSemesters.isEmpty)
                 const EmptyState(
                   icon: Icons.school_outlined,
                   title: 'No semesters yet',
                   subtitle: 'Add your first semester to start calculating',
                 )
               else
-                ...cgpaState.semesters.map((entry) {
+                ...cgpaSemesters.map((entry) {
                   return SemesterCard(
                     key: ValueKey(entry.id),
                     semester: entry,

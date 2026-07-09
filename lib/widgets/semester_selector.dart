@@ -97,7 +97,7 @@ class SemesterSelector extends ConsumerWidget {
                               Icons.close,
                               size: 16,
                               color: isSelected
-                                  ? Colors.cyanAccent.withValues(alpha: 0.6)
+                                  ? const Color(0x9900E5FF)
                                   : Colors.white30,
                             ),
                           ),

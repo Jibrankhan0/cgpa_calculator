@@ -19,9 +19,9 @@ class ModeSelector extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: const Color(0x0DFFFFFF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: const Color(0x14FFFFFF)),
       ),
       child: Row(
         children: [
@@ -54,7 +54,7 @@ class ModeSelector extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: AppTheme.accentPrimary.withValues(alpha: 0.3),
+                      color: const Color(0x4D6366F1),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
