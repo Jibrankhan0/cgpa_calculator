@@ -7,6 +7,15 @@ class EmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
 
+  static final _titleStyle = GoogleFonts.lexend(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _subtitleStyle = GoogleFonts.inter(
+    fontSize: 13,
+  );
+
   const EmptyState({
     super.key,
     required this.icon,
@@ -43,17 +52,14 @@ class EmptyState extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: GoogleFonts.lexend(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+              style: _titleStyle.copyWith(
                 color: AppTheme.textSecondary(context),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: GoogleFonts.inter(
-                fontSize: 13,
+              style: _subtitleStyle.copyWith(
                 color: AppTheme.textMuted(context),
               ),
             ),

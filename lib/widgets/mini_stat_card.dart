@@ -7,6 +7,17 @@ class MiniStatCard extends StatelessWidget {
   final String value;
   final Color? valueColor;
 
+  static final _labelStyle = GoogleFonts.inter(
+    fontSize: 9,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.2,
+  );
+
+  static final _valueStyle = GoogleFonts.lexend(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+  );
+
   const MiniStatCard({
     super.key,
     required this.label,
@@ -32,19 +43,14 @@ class MiniStatCard extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: GoogleFonts.inter(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
+            style: _labelStyle.copyWith(
               color: AppTheme.textMuted(context),
-              letterSpacing: 1.2,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: GoogleFonts.lexend(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
+            style: _valueStyle.copyWith(
               color: valueColor ?? AppTheme.textPrimary(context),
             ),
           ),

@@ -8,6 +8,11 @@ class ModeSelector extends StatelessWidget {
   final CalculationMode currentMode;
   final Function(CalculationMode) onChanged;
 
+  static final _tabStyle = GoogleFonts.inter(
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+  );
+
   const ModeSelector({
     super.key,
     required this.currentMode,
@@ -68,12 +73,11 @@ class ModeSelector extends StatelessWidget {
           child: Center(
             child: Text(
               label,
-              style: GoogleFonts.inter(
+              style: _tabStyle.copyWith(
                 color: isSelected
                     ? Colors.white
                     : (isDark ? AppTheme.darkTextMuted : AppTheme.lightTextMuted),
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                fontSize: 13,
               ),
             ),
           ),

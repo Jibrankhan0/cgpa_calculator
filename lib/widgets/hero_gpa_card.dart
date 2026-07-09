@@ -11,6 +11,18 @@ class HeroGpaCard extends StatelessWidget {
   final double totalCredits;
   final int courseCount;
 
+  static final _labelStyle = GoogleFonts.inter(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.5,
+  );
+
+  static final _gpaStyle = GoogleFonts.lexend(
+    fontSize: 44,
+    fontWeight: FontWeight.bold,
+    height: 1,
+  );
+
   const HeroGpaCard({
     super.key,
     required this.gpa,
@@ -25,7 +37,6 @@ class HeroGpaCard extends StatelessWidget {
 
     return RepaintBoundary(
       child: GlassCard(
-        glowColor: gpaColor,
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
@@ -42,21 +53,15 @@ class HeroGpaCard extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
+                    style: _labelStyle.copyWith(
                       color: AppTheme.textMuted(context),
-                      letterSpacing: 1.5,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     gpa.toStringAsFixed(2),
-                    style: GoogleFonts.lexend(
-                      fontSize: 44,
-                      fontWeight: FontWeight.bold,
+                    style: _gpaStyle.copyWith(
                       color: gpaColor,
-                      height: 1,
                     ),
                   ),
                 ],
