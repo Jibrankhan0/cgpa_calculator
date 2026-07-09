@@ -450,7 +450,14 @@ final marksStatsProvider = Provider((ref) {
   return _calculateStats(semesterState);
 });
 
-dynamic _calculateStats(SemesterState semesterState) {
+typedef GpaStats = ({
+  double cgpa,
+  double semesterGpa,
+  double totalCredits,
+  double qualityPoints,
+});
+
+GpaStats _calculateStats(SemesterState semesterState) {
   double totalCreditsAll = 0;
   double totalQualityPointsAll = 0;
   double selectedSemesterCredits = 0;
