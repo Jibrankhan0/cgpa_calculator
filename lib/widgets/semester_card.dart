@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +43,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
   late FocusNode _nameFocus;
   late FocusNode _gpaFocus;
   bool _isGpaFocused = false;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -96,6 +98,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _nameFocus.dispose();
     _gpaFocus.dispose();
     _nameController.dispose();
@@ -168,18 +171,21 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
                       color: AppTheme.accentPrimary,
                     ),
                     onChanged: (val) {
-                      double gpa = double.tryParse(val) ?? 0;
-                      if (gpa > 4.0) {
-                        gpa = 4.0;
-                        _gpaController.text = '4.0';
-                        _gpaController.selection = TextSelection.fromPosition(
-                          TextPosition(offset: _gpaController.text.length),
-                        );
-                      }
-                      ref.read(cgpaProvider.notifier).updateSemester(
-                            widget.semester.id,
-                            gpa: gpa,
+                      _debounce?.cancel();
+                      _debounce = Timer(Duration(milliseconds: 300), () {
+                        double gpa = double.tryParse(val) ?? 0;
+                        if (gpa > 4.0) {
+                          gpa = 4.0;
+                          _gpaController.text = '4.0';
+                          _gpaController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: _gpaController.text.length),
                           );
+                        }
+                        ref.read(cgpaProvider.notifier).updateSemester(
+                              widget.semester.id,
+                              gpa: gpa,
+                            );
+                      });
                     },
                   ),
                 ),
