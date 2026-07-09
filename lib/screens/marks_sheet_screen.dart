@@ -20,6 +20,38 @@ class MarksSheetScreen extends ConsumerStatefulWidget {
 
 class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
     with SingleTickerProviderStateMixin {
+  // Cached GoogleFonts base TextStyles — avoids re-resolving font family on every build.
+  // Dynamic colors are applied via .copyWith() at usage sites.
+  static final _appBarTitleStyle = GoogleFonts.lexend(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _snackBarTextStyle = GoogleFonts.inter(
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _saveButtonStyle = GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w800,
+    letterSpacing: 0.5,
+  );
+
+  static final _tabLabelStyle = GoogleFonts.lexend(
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _tabUnselectedLabelStyle = GoogleFonts.lexend(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+  );
+
+  static final _addCourseButtonStyle = GoogleFonts.inter(
+    fontWeight: FontWeight.w800,
+    letterSpacing: 0.5,
+  );
+
   TabController? _tabController;
 
   @override
@@ -38,23 +70,22 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
 
   @override
   Widget build(BuildContext context) {
-    final semesterSemesters = ref.watch(
-      marksSheetProvider.select((s) => s.semesters),
+    final semCount = ref.watch(
+      marksSheetProvider.select((s) => s.semesters.length),
     );
     final semesterSelectedIndex = ref.watch(
       marksSheetProvider.select((s) => s.selectedIndex),
     );
-    final stats = ref.watch(marksStatsProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    if (_tabController == null ||
-        _tabController!.length != semesterSemesters.length) {
+    final semesterNames = ref.watch(
+      marksSheetProvider.select((s) => s.semesters.map((x) => x.name).toList()),
+    );
+    if (_tabController == null || _tabController!.length != semCount) {
       final oldIndex = _tabController?.index ?? semesterSelectedIndex;
       _tabController?.dispose();
       _tabController = TabController(
-        length: semesterSemesters.length,
+        length: semCount,
         vsync: this,
-        initialIndex: oldIndex.clamp(0, semesterSemesters.length - 1),
+        initialIndex: oldIndex.clamp(0, semCount - 1),
       );
       _tabController!.addListener(() {
         if (!_tabController!.indexIsChanging) {
@@ -82,11 +113,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
         centerTitle: true,
         title: Text(
           'Marks Sheet',
-          style: GoogleFonts.lexend(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary(context),
-          ),
+          style: _appBarTitleStyle.copyWith(color: AppTheme.textPrimary(context)),
         ),
         actions: [
           IconButton(
@@ -96,10 +123,11 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
             ),
             onPressed: () {
               HapticFeedback.lightImpact();
-              final stats = ref.read(marksStatsProvider);
+              final allSemesters = ref.read(marksSheetProvider).semesters;
+              final s = ref.read(marksStatsProvider);
               PdfService.generateMarksSheet(
-                semesters: semesterSemesters,
-                overallCGPA: stats.cgpa.toStringAsFixed(2),
+                semesters: allSemesters,
+                overallCGPA: s.cgpa.toStringAsFixed(2),
               );
             },
             tooltip: 'Download PDF',
@@ -113,10 +141,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                 SnackBar(
                   content: Text(
                     'Data Saved Locally',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: _snackBarTextStyle.copyWith(color: Colors.white),
                   ),
                   backgroundColor: AppTheme.accentPrimary,
                   duration: const Duration(seconds: 1),
@@ -134,12 +159,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
             ),
             label: Text(
               'SAVE',
-              style: GoogleFonts.inter(
-                color: AppTheme.accentPrimary,
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-                letterSpacing: 0.5,
-              ),
+              style: _saveButtonStyle.copyWith(color: AppTheme.accentPrimary),
             ),
           ),
           const SizedBox(width: 4),
@@ -156,7 +176,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
           ),
           const SizedBox(width: 8),
         ],
-        bottom: semesterSemesters.isEmpty
+        bottom: semCount == 0
             ? null
             : TabBar(
                 controller: _tabController,
@@ -165,21 +185,15 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                 labelColor: AppTheme.accentPrimary,
                 unselectedLabelColor: AppTheme.textMuted(context),
                 indicatorWeight: 3,
-                labelStyle: GoogleFonts.lexend(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                unselectedLabelStyle: GoogleFonts.lexend(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
-                ),
-                tabs: semesterSemesters
-                    .map((s) => Tab(text: s.name.toUpperCase()))
+                labelStyle: _tabLabelStyle,
+                unselectedLabelStyle: _tabUnselectedLabelStyle,
+                tabs: semesterNames
+                    .map((name) => Tab(text: name.toUpperCase()))
                     .toList(),
               ),
       ),
       body: MeshGradientBackground(
-        child: semesterSemesters.isEmpty
+        child: semCount == 0
             ? const Padding(
                 padding: EdgeInsets.only(top: 120),
                 child: EmptyState(
@@ -190,192 +204,12 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               )
             : TabBarView(
                 controller: _tabController,
-                children: List.generate(semesterSemesters.length, (index) {
-                  final semester = semesterSemesters[index];
-                  final semesterGpa = _calculateSemesterGpa(semester);
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.only(
-                      top: 100,
-                      left: 16,
-                      right: 16,
-                      bottom: 100,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        GlassCard(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            semester.name,
-                                            style: GoogleFonts.lexend(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppTheme.textPrimary(context),
-                                            ),
-                                          ),
-                                        ),
-                                        if (semesterSemesters.length > 1)
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.delete_outline_rounded,
-                                              color: AppTheme.danger,
-                                              size: 20,
-                                            ),
-                                            onPressed: () =>
-                                                _showDeleteSemesterDialog(
-                                              context,
-                                              semester.name,
-                                            ),
-                                            tooltip: 'Delete Semester',
-                                            padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(),
-                                          ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.info_outline,
-                                          size: 14,
-                                          color: AppTheme.textMuted(context),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '${semester.courses.length} Courses  •  ',
-                                          style: GoogleFonts.inter(
-                                            color: AppTheme.textSecondary(context),
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        Text(
-                                          'GPA: ${semesterGpa.toStringAsFixed(2)}',
-                                          style: GoogleFonts.inter(
-                                            color: AppTheme.accentPrimary,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'OVERALL CGPA',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppTheme.textMuted(context),
-                                      letterSpacing: 1.2,
-                                    ),
-                                  ),
-                                  Text(
-                                    stats.cgpa.toStringAsFixed(2),
-                                    style: GoogleFonts.lexend(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppTheme.getGpaColor(stats.cgpa),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0x146366F1)
-                                : const Color(0x0D6366F1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isDark
-                                  ? const Color(0x266366F1)
-                                  : const Color(0x1A6366F1),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.storage_rounded,
-                                color: AppTheme.accentPrimary,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Marks Sheet — Data Store',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppTheme.textPrimary(context),
-                                        letterSpacing: 0.3,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Store your course marks here. This data will be used to calculate GPA.',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        color: AppTheme.textSecondary(context),
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        if (semester.courses.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 40),
-                            child: EmptyState(
-                              icon: Icons.book_outlined,
-                              title: 'No courses yet',
-                              subtitle: 'Tap + to add your first course',
-                            ),
-                          )
-                        else
-                          ...semester.courses.asMap().entries.map((entry) {
-                            return CourseInputCard(
-                              key: ValueKey(entry.value.id),
-                              course: entry.value,
-                              notifierOverride:
-                                  ref.read(marksSheetProvider.notifier),
-                            );
-                          }),
-                      ],
-                    ),
-                  );
+                children: List.generate(semCount, (index) {
+                  return _SemesterTab(semesterIndex: index);
                 }),
               ),
       ),
-      floatingActionButton: semesterSemesters.isEmpty
+      floatingActionButton: semCount == 0
           ? null
           : FloatingActionButton.extended(
               onPressed: () {
@@ -391,28 +225,267 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
               icon: const Icon(Icons.add_rounded, color: Colors.white),
               label: Text(
                 'ADD COURSE',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.5,
-                ),
+                style: _addCourseButtonStyle.copyWith(color: Colors.white),
               ),
             ),
     );
   }
+}
 
-  double _calculateSemesterGpa(dynamic semester) {
-    double credits = 0;
-    double points = 0;
-    for (final course in semester.courses) {
-      final p = GpaService.getPoints(course.grade);
-      points += p * course.creditHours;
-      credits += course.creditHours;
+class _SemesterTab extends ConsumerWidget {
+  // Cached GoogleFonts base TextStyles — avoids re-resolving font family on every build.
+  // Dynamic colors are applied via .copyWith() at usage sites.
+  static final _semesterNameStyle = GoogleFonts.lexend(
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+  );
+
+  static final _courseCountStyle = GoogleFonts.inter(
+    fontSize: 12,
+  );
+
+  static final _semesterGpaStyle = GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+  );
+
+  static final _overallCgpaLabelStyle = GoogleFonts.inter(
+    fontSize: 9,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.2,
+  );
+
+  static final _overallCgpaValueStyle = GoogleFonts.lexend(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+  );
+
+  static final _dataStoreTitleStyle = GoogleFonts.inter(
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.3,
+  );
+
+  static final _dataStoreSubtitleStyle = GoogleFonts.inter(
+    fontSize: 11,
+    height: 1.4,
+  );
+
+  static final _dialogTitleStyle = GoogleFonts.lexend(
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _dialogContentStyle = GoogleFonts.inter();
+
+  static final _dialogCancelStyle = GoogleFonts.inter(
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _dialogDeleteStyle = GoogleFonts.inter(
+    fontWeight: FontWeight.w700,
+  );
+
+  final int semesterIndex;
+
+  const _SemesterTab({required this.semesterIndex});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final semesterName = ref.watch(
+      marksSheetProvider.select((s) => s.semesters[semesterIndex].name),
+    );
+    final courseIds = ref.watch(
+      marksSheetProvider.select((s) =>
+          s.semesters[semesterIndex].courses.map((c) => c.id).toList()),
+    );
+    final totalSemesters = ref.watch(
+      marksSheetProvider.select((s) => s.semesters.length),
+    );
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    double semesterGpa = 0;
+    double overallCgpa = 0;
+    final semState = ref.read(marksSheetProvider);
+    if (semesterIndex < semState.semesters.length) {
+      double credits = 0;
+      double points = 0;
+      for (final course in semState.semesters[semesterIndex].courses) {
+        final p = GpaService.getPoints(course.grade);
+        points += p * course.creditHours;
+        credits += course.creditHours;
+      }
+      semesterGpa = credits > 0 ? points / credits : 0.0;
     }
-    return credits > 0 ? points / credits : 0.0;
+    {
+      double totalCredits = 0;
+      double totalPoints = 0;
+      for (final sem in semState.semesters) {
+        for (final course in sem.courses) {
+          final p = GpaService.getPoints(course.grade);
+          totalPoints += p * course.creditHours;
+          totalCredits += course.creditHours;
+        }
+      }
+      overallCgpa = totalCredits > 0 ? totalPoints / totalCredits : 0.0;
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(
+        top: 100,
+        left: 16,
+        right: 16,
+        bottom: 100,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GlassCard(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              semesterName,
+                              style: _semesterNameStyle.copyWith(color: AppTheme.textPrimary(context)),
+                            ),
+                          ),
+                          if (totalSemesters > 1)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline_rounded,
+                                color: AppTheme.danger,
+                                size: 20,
+                              ),
+                              onPressed: () =>
+                                  _showDeleteSemesterDialog(
+                                context,
+                                ref,
+                                semesterName,
+                              ),
+                              tooltip: 'Delete Semester',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 14,
+                            color: AppTheme.textMuted(context),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${courseIds.length} Courses  •  ',
+                            style: _courseCountStyle.copyWith(color: AppTheme.textSecondary(context)),
+                          ),
+                          Text(
+                            'GPA: ${semesterGpa.toStringAsFixed(2)}',
+                            style: _semesterGpaStyle.copyWith(color: AppTheme.accentPrimary),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'OVERALL CGPA',
+                      style: _overallCgpaLabelStyle.copyWith(color: AppTheme.textMuted(context)),
+                    ),
+                    Text(
+                      overallCgpa.toStringAsFixed(2),
+                      style: _overallCgpaValueStyle.copyWith(color: AppTheme.getGpaColor(overallCgpa)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? const Color(0x146366F1)
+                  : const Color(0x0D6366F1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0x266366F1)
+                    : const Color(0x1A6366F1),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.storage_rounded,
+                  color: AppTheme.accentPrimary,
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Marks Sheet — Data Store',
+                        style: _dataStoreTitleStyle.copyWith(color: AppTheme.textPrimary(context)),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Store your course marks here. This data will be used to calculate GPA.',
+                        style: _dataStoreSubtitleStyle.copyWith(color: AppTheme.textSecondary(context)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (courseIds.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: EmptyState(
+                icon: Icons.book_outlined,
+                title: 'No courses yet',
+                subtitle: 'Tap + to add your first course',
+              ),
+            )
+          else
+            ...courseIds.map((courseId) {
+              final course = ref.read(marksSheetProvider).semesters
+                  .expand((s) => s.courses)
+                  .firstWhere((c) => c.id == courseId);
+              return CourseInputCard(
+                key: ValueKey(courseId),
+                course: course,
+                notifierOverride:
+                    ref.read(marksSheetProvider.notifier),
+              );
+            }),
+        ],
+      ),
+    );
   }
 
-  void _showDeleteSemesterDialog(BuildContext context, String semesterName) {
+  void _showDeleteSemesterDialog(BuildContext context, WidgetRef ref, String semesterName) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
@@ -426,41 +499,29 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
         ),
         title: Text(
           'Delete $semesterName?',
-          style: GoogleFonts.lexend(
-            color: AppTheme.textPrimary(context),
-            fontWeight: FontWeight.w600,
-          ),
+          style: _dialogTitleStyle.copyWith(color: AppTheme.textPrimary(context)),
         ),
         content: Text(
           'This will permanently remove all courses and marks for this semester.',
-          style: GoogleFonts.inter(
-            color: AppTheme.textSecondary(context),
-          ),
+          style: _dialogContentStyle.copyWith(color: AppTheme.textSecondary(context)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               'CANCEL',
-              style: GoogleFonts.inter(
-                color: AppTheme.textMuted(context),
-                fontWeight: FontWeight.w600,
-              ),
+              style: _dialogCancelStyle.copyWith(color: AppTheme.textMuted(context)),
             ),
           ),
           TextButton(
             onPressed: () {
-              final index = _tabController?.index ?? 0;
-              ref.read(marksSheetProvider.notifier).removeSemester(index);
+              ref.read(marksSheetProvider.notifier).removeSemester(semesterIndex);
               Navigator.pop(context);
               HapticFeedback.heavyImpact();
             },
             child: Text(
               'DELETE',
-              style: GoogleFonts.inter(
-                color: AppTheme.danger,
-                fontWeight: FontWeight.w700,
-              ),
+              style: _dialogDeleteStyle.copyWith(color: AppTheme.danger),
             ),
           ),
         ],
