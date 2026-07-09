@@ -474,17 +474,21 @@ class _SemesterTab extends ConsumerWidget {
               ),
             )
           else
-            ...courseIds.map((courseId) {
-              final course = ref.read(marksSheetProvider).semesters
-                  .expand((s) => s.courses)
-                  .firstWhere((c) => c.id == courseId);
-              return CourseInputCard(
-                key: ValueKey(courseId),
-                course: course,
-                notifierOverride:
-                    ref.read(marksSheetProvider.notifier),
-              );
-            }),
+            ...() {
+              final courseMap = {
+                for (var s in ref.read(marksSheetProvider).semesters)
+                  for (var c in s.courses) c.id: c
+              };
+              return courseIds.map((courseId) {
+                final course = courseMap[courseId]!;
+                return CourseInputCard(
+                  key: ValueKey(courseId),
+                  course: course,
+                  notifierOverride:
+                      ref.read(marksSheetProvider.notifier),
+                );
+              });
+            }(),
         ],
       ),
     );
