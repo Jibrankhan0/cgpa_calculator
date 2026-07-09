@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/course.dart';
 import '../providers/semester_provider.dart';
+import '../services/gpa_service.dart';
 import '../theme/app_theme.dart';
 import 'glass_card.dart';
 import 'grade_badge.dart';
@@ -70,19 +71,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.course.name);
-    _midController = TextEditingController(
-      text: widget.course.midMarks == 0 ? '' : widget.course.midMarks.toStringAsFixed(0),
-    );
-    _finalController = TextEditingController(
-      text: widget.course.finalMarks == 0 ? '' : widget.course.finalMarks.toStringAsFixed(0),
-    );
-    _sessionalController = TextEditingController(
-      text: widget.course.sessionalMarks == 0 ? '' : widget.course.sessionalMarks.toStringAsFixed(0),
-    );
-    _totalController = TextEditingController(
-      text: widget.course.totalMarks == 0 ? '' : widget.course.totalMarks.toStringAsFixed(0),
-    );
+    _initControllers(widget.course);
 
     _nameFocus = FocusNode();
     _midFocus = FocusNode();
@@ -93,6 +82,30 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     _setupFocusListeners();
   }
 
+  void _initControllers(Course course) {
+    _nameController = TextEditingController(text: course.name);
+    _midController = TextEditingController(
+      text: course.midMarks == 0 ? '' : course.midMarks.toStringAsFixed(0),
+    );
+    _finalController = TextEditingController(
+      text: course.finalMarks == 0 ? '' : course.finalMarks.toStringAsFixed(0),
+    );
+    _sessionalController = TextEditingController(
+      text: course.sessionalMarks == 0 ? '' : course.sessionalMarks.toStringAsFixed(0),
+    );
+    _totalController = TextEditingController(
+      text: course.totalMarks == 0 ? '' : course.totalMarks.toStringAsFixed(0),
+    );
+  }
+
+  void _disposeControllers() {
+    _nameController.dispose();
+    _midController.dispose();
+    _finalController.dispose();
+    _sessionalController.dispose();
+    _totalController.dispose();
+  }
+
   void _setupFocusListeners() {
     _nameFocus.addListener(() {
       if (!_nameFocus.hasFocus && _nameController.text != widget.course.name) {
@@ -100,19 +113,19 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
       }
     });
     _midFocus.addListener(() {
-      _isMidFocused = _midFocus.hasFocus;
+      setState(() { _isMidFocused = _midFocus.hasFocus; });
       _onMarksFocusLost('mid');
     });
     _finalFocus.addListener(() {
-      _isFinalFocused = _finalFocus.hasFocus;
+      setState(() { _isFinalFocused = _finalFocus.hasFocus; });
       _onMarksFocusLost('final');
     });
     _sessionalFocus.addListener(() {
-      _isSessionalFocused = _sessionalFocus.hasFocus;
+      setState(() { _isSessionalFocused = _sessionalFocus.hasFocus; });
       _onMarksFocusLost('sessional');
     });
     _totalFocus.addListener(() {
-      _isTotalFocused = _totalFocus.hasFocus;
+      setState(() { _isTotalFocused = _totalFocus.hasFocus; });
       if (!_totalFocus.hasFocus) {
         double val = double.tryParse(_totalController.text) ?? 0;
         if (val > 100) val = 100;
@@ -124,32 +137,30 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   }
 
   void _onMarksFocusLost(String type) {
-    double val = 0;
-    switch (type) {
-      case 'mid':
-        if (!_midFocus.hasFocus) val = double.tryParse(_midController.text) ?? 0;
-        break;
-      case 'final':
-        if (!_finalFocus.hasFocus) val = double.tryParse(_finalController.text) ?? 0;
-        break;
-      case 'sessional':
-        if (!_sessionalFocus.hasFocus) val = double.tryParse(_sessionalController.text) ?? 0;
-        break;
-    }
-    if (val > 100) val = 100;
+    double mid = double.tryParse(_midController.text) ?? 0;
+    double final_ = double.tryParse(_finalController.text) ?? 0;
+    double sessional = double.tryParse(_sessionalController.text) ?? 0;
+    if (mid > 100) mid = 100;
+    if (final_ > 100) final_ = 100;
+    if (sessional > 100) sessional = 100;
+    double total = mid + final_ + sessional;
+    if (total > 100) total = 100;
 
     switch (type) {
       case 'mid':
-        _notifier.updateCourse(widget.course.id, midMarks: val,
-            totalMarks: val + widget.course.finalMarks + widget.course.sessionalMarks);
+        if (!_midFocus.hasFocus) {
+          _notifier.updateCourse(widget.course.id, midMarks: mid, totalMarks: total);
+        }
         break;
       case 'final':
-        _notifier.updateCourse(widget.course.id, finalMarks: val,
-            totalMarks: widget.course.midMarks + val + widget.course.sessionalMarks);
+        if (!_finalFocus.hasFocus) {
+          _notifier.updateCourse(widget.course.id, finalMarks: final_, totalMarks: total);
+        }
         break;
       case 'sessional':
-        _notifier.updateCourse(widget.course.id, sessionalMarks: val,
-            totalMarks: widget.course.midMarks + widget.course.finalMarks + val);
+        if (!_sessionalFocus.hasFocus) {
+          _notifier.updateCourse(widget.course.id, sessionalMarks: sessional, totalMarks: total);
+        }
         break;
     }
   }
@@ -157,20 +168,25 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   @override
   void didUpdateWidget(CourseInputCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.course.name != widget.course.name && !_nameFocus.hasFocus) {
-      _nameController.text = widget.course.name;
-    }
-    if (oldWidget.course.midMarks != widget.course.midMarks && !_midFocus.hasFocus) {
-      _midController.text = widget.course.midMarks == 0 ? '' : widget.course.midMarks.toStringAsFixed(0);
-    }
-    if (oldWidget.course.finalMarks != widget.course.finalMarks && !_finalFocus.hasFocus) {
-      _finalController.text = widget.course.finalMarks == 0 ? '' : widget.course.finalMarks.toStringAsFixed(0);
-    }
-    if (oldWidget.course.sessionalMarks != widget.course.sessionalMarks && !_sessionalFocus.hasFocus) {
-      _sessionalController.text = widget.course.sessionalMarks == 0 ? '' : widget.course.sessionalMarks.toStringAsFixed(0);
-    }
-    if (oldWidget.course.totalMarks != widget.course.totalMarks && !_totalFocus.hasFocus) {
-      _totalController.text = widget.course.totalMarks == 0 ? '' : widget.course.totalMarks.toStringAsFixed(0);
+    if (oldWidget.course.id != widget.course.id) {
+      _disposeControllers();
+      _initControllers(widget.course);
+    } else {
+      if (oldWidget.course.name != widget.course.name && !_nameFocus.hasFocus) {
+        _nameController.text = widget.course.name;
+      }
+      if (oldWidget.course.midMarks != widget.course.midMarks && !_midFocus.hasFocus) {
+        _midController.text = widget.course.midMarks == 0 ? '' : widget.course.midMarks.toStringAsFixed(0);
+      }
+      if (oldWidget.course.finalMarks != widget.course.finalMarks && !_finalFocus.hasFocus) {
+        _finalController.text = widget.course.finalMarks == 0 ? '' : widget.course.finalMarks.toStringAsFixed(0);
+      }
+      if (oldWidget.course.sessionalMarks != widget.course.sessionalMarks && !_sessionalFocus.hasFocus) {
+        _sessionalController.text = widget.course.sessionalMarks == 0 ? '' : widget.course.sessionalMarks.toStringAsFixed(0);
+      }
+      if (oldWidget.course.totalMarks != widget.course.totalMarks && !_totalFocus.hasFocus) {
+        _totalController.text = widget.course.totalMarks == 0 ? '' : widget.course.totalMarks.toStringAsFixed(0);
+      }
     }
   }
 
@@ -181,11 +197,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     _finalFocus.dispose();
     _sessionalFocus.dispose();
     _totalFocus.dispose();
-    _nameController.dispose();
-    _midController.dispose();
-    _finalController.dispose();
-    _sessionalController.dispose();
-    _totalController.dispose();
+    _disposeControllers();
     super.dispose();
   }
 
@@ -207,6 +219,14 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   Widget build(BuildContext context) {
     final isLab = widget.course.isPractical;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final liveTotal = (double.tryParse(_midController.text) ?? 0) +
+        (double.tryParse(_finalController.text) ?? 0) +
+        (double.tryParse(_sessionalController.text) ?? 0);
+    final clampedTotal = liveTotal > 100 ? 100.0 : liveTotal;
+    final liveGrade = GpaService.getGradeFromMarks(
+      clampedTotal,
+      isPractical: isLab,
+    );
 
     return RepaintBoundary(
       child: Padding(
@@ -394,7 +414,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     ],
                   ),
                   const Spacer(),
-                  GradeBadge(grade: widget.course.grade),
+                  GradeBadge(grade: liveGrade),
                   const SizedBox(width: 12),
                   IconButton(
                     icon: Icon(Icons.delete_outline_rounded, size: 20,
@@ -458,6 +478,11 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     TextPosition(offset: controller.text.length),
                   );
                 }
+                final total = (double.tryParse(_midController.text) ?? 0) +
+                    (double.tryParse(_finalController.text) ?? 0) +
+                    (double.tryParse(_sessionalController.text) ?? 0);
+                final clamped = total > 100 ? 100.0 : total;
+                _totalController.text = clamped == 0 ? '' : clamped.toStringAsFixed(0);
               },
             ),
           ),
