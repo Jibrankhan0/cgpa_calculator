@@ -16,12 +16,16 @@ class MiniStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0x0AFFFFFF),
+        color: isDark ? const Color(0x0AFFFFFF) : const Color(0x0A000000),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0x14FFFFFF)),
+        border: Border.all(
+          color: isDark ? const Color(0x14FFFFFF) : const Color(0x14000000),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -31,7 +35,7 @@ class MiniStatCard extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 9,
               fontWeight: FontWeight.w700,
-              color: AppTheme.textMuted,
+              color: AppTheme.textMuted(context),
               letterSpacing: 1.2,
             ),
           ),
@@ -41,7 +45,7 @@ class MiniStatCard extends StatelessWidget {
             style: GoogleFonts.lexend(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: valueColor ?? AppTheme.textPrimary,
+              color: valueColor ?? AppTheme.textPrimary(context),
             ),
           ),
         ],

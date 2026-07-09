@@ -11,7 +11,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _textController;
   late Animation<double> _logoScale;
@@ -83,20 +83,23 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppTheme.bgGradientStart, AppTheme.bgPrimary],
+            colors: isDark
+                ? [AppTheme.darkBgGradientStart, AppTheme.darkBgPrimary]
+                : [AppTheme.lightBgGradientStart, AppTheme.lightBgPrimary],
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo
             AnimatedBuilder(
               animation: _logoController,
               builder: (context, child) {
@@ -107,13 +110,13 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Container(
                       height: 100,
                       width: 100,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0x4D6366F1),
+                            color: Color(0x4D6366F1),
                             blurRadius: 30,
-                            offset: const Offset(0, 10),
+                            offset: Offset(0, 10),
                           ),
                         ],
                       ),
@@ -129,7 +132,6 @@ class _SplashScreenState extends State<SplashScreen>
               },
             ),
             const SizedBox(height: 32),
-            // App Name
             AnimatedBuilder(
               animation: _textController,
               builder: (context, child) {
@@ -147,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                               style: GoogleFonts.lexend(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: AppTheme.textPrimary,
+                                color: AppTheme.textPrimary(context),
                                 letterSpacing: 3,
                               ),
                             ),
@@ -157,7 +159,7 @@ class _SplashScreenState extends State<SplashScreen>
                               style: GoogleFonts.lexend(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w300,
-                                color: AppTheme.textMuted,
+                                color: AppTheme.textMuted(context),
                                 letterSpacing: 3,
                               ),
                             ),

@@ -8,18 +8,19 @@ class MeshGradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Stack(
       children: [
         RepaintBoundary(
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  AppTheme.bgGradientStart,
-                  AppTheme.bgPrimary,
-                ],
+                colors: isDark
+                    ? [AppTheme.darkBgGradientStart, AppTheme.darkBgPrimary]
+                    : [AppTheme.lightBgGradientStart, AppTheme.lightBgPrimary],
               ),
             ),
           ),

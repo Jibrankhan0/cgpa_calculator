@@ -45,6 +45,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
       marksSheetProvider.select((s) => s.selectedIndex),
     );
     final stats = ref.watch(marksStatsProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (_tabController == null ||
         _tabController!.length != semesterSemesters.length) {
@@ -72,9 +73,9 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimary(context),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -84,7 +85,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
           style: GoogleFonts.lexend(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimary(context),
           ),
         ),
         actions: [
@@ -162,7 +163,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                 isScrollable: true,
                 indicatorColor: AppTheme.accentPrimary,
                 labelColor: AppTheme.accentPrimary,
-                unselectedLabelColor: AppTheme.textMuted,
+                unselectedLabelColor: AppTheme.textMuted(context),
                 indicatorWeight: 3,
                 labelStyle: GoogleFonts.lexend(
                   fontWeight: FontWeight.w600,
@@ -218,7 +219,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                             style: GoogleFonts.lexend(
                                               fontSize: 22,
                                               fontWeight: FontWeight.w700,
-                                              color: AppTheme.textPrimary,
+                                              color: AppTheme.textPrimary(context),
                                             ),
                                           ),
                                         ),
@@ -236,24 +237,23 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                             ),
                                             tooltip: 'Delete Semester',
                                             padding: EdgeInsets.zero,
-                                            constraints:
-                                                const BoxConstraints(),
+                                            constraints: const BoxConstraints(),
                                           ),
                                       ],
                                     ),
                                     const SizedBox(height: 6),
                                     Row(
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.info_outline,
                                           size: 14,
-                                          color: AppTheme.textMuted,
+                                          color: AppTheme.textMuted(context),
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
                                           '${semester.courses.length} Courses  •  ',
                                           style: GoogleFonts.inter(
-                                            color: AppTheme.textSecondary,
+                                            color: AppTheme.textSecondary(context),
                                             fontSize: 12,
                                           ),
                                         ),
@@ -279,7 +279,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                     style: GoogleFonts.inter(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w700,
-                                      color: AppTheme.textMuted,
+                                      color: AppTheme.textMuted(context),
                                       letterSpacing: 1.2,
                                     ),
                                   ),
@@ -288,8 +288,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                     style: GoogleFonts.lexend(
                                       fontSize: 28,
                                       fontWeight: FontWeight.bold,
-                                      color:
-                                          AppTheme.getGpaColor(stats.cgpa),
+                                      color: AppTheme.getGpaColor(stats.cgpa),
                                     ),
                                   ),
                                 ],
@@ -305,10 +304,14 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0x146366F1),
+                            color: isDark
+                                ? const Color(0x146366F1)
+                                : const Color(0x0D6366F1),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0x266366F1),
+                              color: isDark
+                                  ? const Color(0x266366F1)
+                                  : const Color(0x1A6366F1),
                             ),
                           ),
                           child: Row(
@@ -321,15 +324,14 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'Marks Sheet — Data Store',
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
-                                        color: AppTheme.textPrimary,
+                                        color: AppTheme.textPrimary(context),
                                         letterSpacing: 0.3,
                                       ),
                                     ),
@@ -338,7 +340,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                                       'Store your course marks here. This data will be used to calculate GPA.',
                                       style: GoogleFonts.inter(
                                         fontSize: 11,
-                                        color: AppTheme.textSecondary,
+                                        color: AppTheme.textSecondary(context),
                                         height: 1.4,
                                       ),
                                     ),
@@ -355,15 +357,11 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
                             child: EmptyState(
                               icon: Icons.book_outlined,
                               title: 'No courses yet',
-                              subtitle:
-                                  'Tap + to add your first course',
+                              subtitle: 'Tap + to add your first course',
                             ),
                           )
                         else
-                          ...semester.courses
-                              .asMap()
-                              .entries
-                              .map((entry) {
+                          ...semester.courses.asMap().entries.map((entry) {
                             return CourseInputCard(
                               key: ValueKey(entry.value.id),
                               course: entry.value,
@@ -415,25 +413,28 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
   }
 
   void _showDeleteSemesterDialog(BuildContext context, String semesterName) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.bgGradientStart,
+        backgroundColor: isDark ? AppTheme.darkBgGradientStart : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppTheme.borderGlass),
+          side: BorderSide(
+            color: isDark ? AppTheme.darkBorderGlass : const Color(0x14000000),
+          ),
         ),
         title: Text(
           'Delete $semesterName?',
           style: GoogleFonts.lexend(
-            color: AppTheme.textPrimary,
+            color: AppTheme.textPrimary(context),
             fontWeight: FontWeight.w600,
           ),
         ),
         content: Text(
           'This will permanently remove all courses and marks for this semester.',
           style: GoogleFonts.inter(
-            color: AppTheme.textSecondary,
+            color: AppTheme.textSecondary(context),
           ),
         ),
         actions: [
@@ -442,7 +443,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
             child: Text(
               'CANCEL',
               style: GoogleFonts.inter(
-                color: AppTheme.textMuted,
+                color: AppTheme.textMuted(context),
                 fontWeight: FontWeight.w600,
               ),
             ),

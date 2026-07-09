@@ -16,23 +16,27 @@ class ModeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0x0DFFFFFF),
+        color: isDark ? const Color(0x0DFFFFFF) : const Color(0x0D000000),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x14FFFFFF)),
+        border: Border.all(
+          color: isDark ? const Color(0x14FFFFFF) : const Color(0x14000000),
+        ),
       ),
       child: Row(
         children: [
-          _buildTab(CalculationMode.gpa, 'GPA (Single)'),
-          _buildTab(CalculationMode.cgpa, 'CGPA (Multi)'),
+          _buildTab(CalculationMode.gpa, 'GPA (Single)', isDark),
+          _buildTab(CalculationMode.cgpa, 'CGPA (Multi)', isDark),
         ],
       ),
     );
   }
 
-  Widget _buildTab(CalculationMode mode, String label) {
+  Widget _buildTab(CalculationMode mode, String label, bool isDark) {
     final isSelected = currentMode == mode;
     return Expanded(
       child: GestureDetector(
@@ -65,7 +69,9 @@ class ModeSelector extends StatelessWidget {
             child: Text(
               label,
               style: GoogleFonts.inter(
-                color: isSelected ? Colors.white : AppTheme.textMuted,
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? AppTheme.darkTextMuted : AppTheme.lightTextMuted),
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                 fontSize: 13,
               ),

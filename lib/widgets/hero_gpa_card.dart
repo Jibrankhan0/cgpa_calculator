@@ -29,7 +29,6 @@ class HeroGpaCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            // Progress Ring
             CircularProgressRing(
               value: gpa,
               color: gpaColor,
@@ -37,7 +36,6 @@ class HeroGpaCard extends StatelessWidget {
               strokeWidth: 8,
             ),
             const SizedBox(width: 20),
-            // GPA Number
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +45,7 @@ class HeroGpaCard extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textMuted,
+                      color: AppTheme.textMuted(context),
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -64,7 +62,6 @@ class HeroGpaCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Mini Stats
             Column(
               children: [
                 MiniStatCard(

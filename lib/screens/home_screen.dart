@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../providers/semester_provider.dart';
+import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/mesh_gradient_background.dart';
 import '../widgets/mode_selector.dart';
@@ -21,13 +22,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  static const _sectionLabelStyle = TextStyle(
-    fontSize: 11,
-    color: AppTheme.textMuted,
-    letterSpacing: 1.5,
-    fontWeight: FontWeight.w800,
-  );
-
   @override
   void initState() {
     super.initState();
@@ -47,6 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       cgpaProvider.select((s) => s.semesters),
     );
     final stats = ref.watch(gpaStatsProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -80,7 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: GoogleFonts.lexend(
                 fontSize: 16,
                 letterSpacing: 2,
-                color: AppTheme.textPrimary,
+                color: AppTheme.textPrimary(context),
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -90,13 +85,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: GoogleFonts.lexend(
                 fontSize: 16,
                 letterSpacing: 2,
-                color: AppTheme.textMuted,
+                color: AppTheme.textMuted(context),
                 fontWeight: FontWeight.w300,
               ),
             ),
           ],
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              color: AppTheme.accentPrimary,
+            ),
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).toggle();
+            },
+          ),
           IconButton(
             icon: const Icon(
               Icons.table_chart_rounded,
@@ -131,7 +135,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               courseCount: semester.courses.length,
             ),
             const SizedBox(height: 24),
-            const Text('SEMESTERS', style: _sectionLabelStyle),
+            Text(
+              'SEMESTERS',
+              style: TextStyle(
+                fontSize: 11,
+                color: AppTheme.textMuted(context),
+                letterSpacing: 1.5,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: 12),
             if (mode == CalculationMode.cgpa) ...[
               if (cgpaSemesters.isEmpty)
@@ -191,22 +203,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 24),
             Center(
               child: Column(
-                children: const [
+                children: [
                   Text(
                     'Developed by',
                     style: TextStyle(
                       fontSize: 10,
-                      color: AppTheme.textMuted,
+                      color: AppTheme.textMuted(context),
                       letterSpacing: 2,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'JIBRAN KHAN DEHPAL',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.textSecondary(context),
                       letterSpacing: 1.5,
                     ),
                   ),

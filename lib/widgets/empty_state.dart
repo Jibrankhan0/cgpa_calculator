@@ -16,6 +16,8 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 32),
@@ -27,8 +29,10 @@ class EmptyState extends StatelessWidget {
               height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0x0D6366F1),
-                border: Border.all(color: const Color(0x1A6366F1)),
+                color: isDark ? const Color(0x0D6366F1) : const Color(0x0D6366F1),
+                border: Border.all(
+                  color: isDark ? const Color(0x1A6366F1) : const Color(0x1A6366F1),
+                ),
               ),
               child: Icon(
                 icon,
@@ -42,7 +46,7 @@ class EmptyState extends StatelessWidget {
               style: GoogleFonts.lexend(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary,
+                color: AppTheme.textSecondary(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -50,7 +54,7 @@ class EmptyState extends StatelessWidget {
               subtitle,
               style: GoogleFonts.inter(
                 fontSize: 13,
-                color: AppTheme.textMuted,
+                color: AppTheme.textMuted(context),
               ),
             ),
           ],

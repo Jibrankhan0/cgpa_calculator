@@ -7,6 +7,7 @@ class CircularProgressRing extends StatefulWidget {
   final Color color;
   final double size;
   final double strokeWidth;
+  final Color? trackColor;
 
   const CircularProgressRing({
     super.key,
@@ -15,6 +16,7 @@ class CircularProgressRing extends StatefulWidget {
     required this.color,
     this.size = 100,
     this.strokeWidth = 8,
+    this.trackColor,
   });
 
   @override
@@ -68,6 +70,10 @@ class _CircularProgressRingState extends State<CircularProgressRing>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final track = widget.trackColor ??
+        (isDark ? const Color(0x1AFFFFFF) : const Color(0x14000000));
+
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -79,6 +85,7 @@ class _CircularProgressRingState extends State<CircularProgressRing>
               progress: _animation.value,
               color: widget.color,
               strokeWidth: widget.strokeWidth,
+              trackColor: track,
             ),
           ),
         );
@@ -91,11 +98,13 @@ class _RingPainter extends CustomPainter {
   final double progress;
   final Color color;
   final double strokeWidth;
+  final Color trackColor;
 
   _RingPainter({
     required this.progress,
     required this.color,
     required this.strokeWidth,
+    required this.trackColor,
   });
 
   @override
@@ -103,16 +112,14 @@ class _RingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    // Background track
     final bgPaint = Paint()
-      ..color = const Color(0x1AFFFFFF)
+      ..color = trackColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, bgPaint);
 
-    // Progress arc
     final progressPaint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
@@ -130,5 +137,7 @@ class _RingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RingPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.color != color;
+      oldDelegate.progress != progress ||
+      oldDelegate.color != color ||
+      oldDelegate.trackColor != trackColor;
 }

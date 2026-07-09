@@ -85,6 +85,18 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Color fieldBg(bool focused) {
+      if (isDark) return focused ? const Color(0x1A6366F1) : const Color(0x0DFFFFFF);
+      return focused ? const Color(0x0D6366F1) : const Color(0x08000000);
+    }
+
+    Color fieldBorder(bool focused) {
+      if (isDark) return focused ? const Color(0x4D6366F1) : const Color(0x14FFFFFF);
+      return focused ? const Color(0x4D6366F1) : const Color(0x14000000);
+    }
+
     return RepaintBoundary(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -92,7 +104,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              const Icon(Icons.school_rounded, color: AppTheme.textMuted, size: 20),
+              Icon(Icons.school_rounded, color: AppTheme.textMuted(context), size: 20),
               const SizedBox(width: 12),
               Expanded(
                 flex: 5,
@@ -103,14 +115,14 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
                     hintText: 'Semester Name',
                     border: InputBorder.none,
                     hintStyle: GoogleFonts.inter(
-                      color: const Color(0x8094A3B8),
+                      color: AppTheme.textMuted(context).withValues(alpha: 0.6),
                       fontSize: 14,
                     ),
                   ),
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.textPrimary(context),
                   ),
                 ),
               ),
@@ -121,11 +133,9 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
                   duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: _isGpaFocused ? const Color(0x1A6366F1) : const Color(0x0DFFFFFF),
+                    color: fieldBg(_isGpaFocused),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: _isGpaFocused ? const Color(0x4D6366F1) : const Color(0x14FFFFFF),
-                    ),
+                    border: Border.all(color: fieldBorder(_isGpaFocused)),
                   ),
                   child: TextField(
                     controller: _gpaController,
@@ -136,7 +146,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
                       hintText: 'GPA',
                       border: InputBorder.none,
                       isDense: true,
-                      hintStyle: GoogleFonts.inter(color: AppTheme.textMuted, fontSize: 13),
+                      hintStyle: GoogleFonts.inter(color: AppTheme.textMuted(context), fontSize: 13),
                     ),
                     style: GoogleFonts.inter(
                       color: AppTheme.accentPrimary,
@@ -162,7 +172,8 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
               ),
               const SizedBox(width: 8),
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.textMuted),
+                icon: Icon(Icons.delete_outline_rounded, size: 20,
+                    color: AppTheme.textMuted(context)),
                 onPressed: () {
                   HapticFeedback.mediumImpact();
                   ref.read(cgpaProvider.notifier).removeSemester(widget.semester.id);

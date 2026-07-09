@@ -160,19 +160,35 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     super.dispose();
   }
 
+  Color _fieldBg(bool isDark, bool focused) {
+    if (isDark) {
+      return focused ? const Color(0x1A6366F1) : const Color(0x0DFFFFFF);
+    }
+    return focused ? const Color(0x0D6366F1) : const Color(0x08000000);
+  }
+
+  Color _fieldBorder(bool isDark, bool focused) {
+    if (isDark) {
+      return focused ? const Color(0x4D6366F1) : const Color(0x14FFFFFF);
+    }
+    return focused ? const Color(0x4D6366F1) : const Color(0x14000000);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLab = widget.course.isPractical;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return RepaintBoundary(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: GlassCard(
           padding: const EdgeInsets.all(16),
-          borderColor: isLab ? const Color(0x336366F1) : const Color(0x1AFFFFFF),
+          borderColor: isLab
+              ? const Color(0x336366F1)
+              : (isDark ? const Color(0x1AFFFFFF) : const Color(0x1A000000)),
           child: Column(
             children: [
-              // Top Row: Lab toggle + Course Name
               Row(
                 children: [
                   GestureDetector(
@@ -187,16 +203,16 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isLab ? const Color(0x266366F1) : const Color(0x0DFFFFFF),
+                        color: isLab ? const Color(0x266366F1) : _fieldBg(isDark, false),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isLab ? const Color(0x4D6366F1) : const Color(0x14FFFFFF),
+                          color: isLab ? const Color(0x4D6366F1) : _fieldBorder(isDark, false),
                         ),
                       ),
                       child: Icon(
                         isLab ? Icons.science : Icons.science_outlined,
                         size: 20,
-                        color: isLab ? AppTheme.accentPrimary : AppTheme.textMuted,
+                        color: isLab ? AppTheme.accentPrimary : AppTheme.textMuted(context),
                       ),
                     ),
                   ),
@@ -211,21 +227,20 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
                         hintStyle: GoogleFonts.inter(
-                          color: const Color(0x8094A3B8),
+                          color: AppTheme.textMuted(context).withValues(alpha: 0.6),
                           fontSize: 14,
                         ),
                       ),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppTheme.textPrimary,
+                        color: AppTheme.textPrimary(context),
                       ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              // Middle Row: Marks fields
               Row(
                 children: [
                   _buildMarkField(
@@ -233,6 +248,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     controller: _midController,
                     focusNode: _midFocus,
                     isFocused: _isMidFocused,
+                    isDark: isDark,
                   ),
                   const SizedBox(width: 10),
                   _buildMarkField(
@@ -240,6 +256,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     controller: _finalController,
                     focusNode: _finalFocus,
                     isFocused: _isFinalFocused,
+                    isDark: isDark,
                   ),
                   const SizedBox(width: 10),
                   _buildMarkField(
@@ -247,28 +264,27 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     controller: _sessionalController,
                     focusNode: _sessionalFocus,
                     isFocused: _isSessionalFocused,
+                    isDark: isDark,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              // Bottom Row: Credits + Total + Grade + Delete
               Row(
                 children: [
-                  // Credits Dropdown
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('CREDITS', style: GoogleFonts.inter(
                         fontSize: 9, fontWeight: FontWeight.w700,
-                        color: AppTheme.textMuted, letterSpacing: 0.5,
+                        color: AppTheme.textMuted(context), letterSpacing: 0.5,
                       )),
                       const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0x0DFFFFFF),
+                          color: _fieldBg(isDark, false),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0x14FFFFFF)),
+                          border: Border.all(color: _fieldBorder(isDark, false)),
                         ),
                         child: isLab
                             ? const Padding(
@@ -282,14 +298,18 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                                 value: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
                                         .contains(widget.course.creditHours)
                                     ? widget.course.creditHours : 3.0,
-                                dropdownColor: AppTheme.bgGradientStart,
+                                dropdownColor: isDark
+                                    ? AppTheme.darkBgGradientStart
+                                    : AppTheme.lightBgGradientStart,
                                 underline: const SizedBox(),
                                 isDense: true,
-                                icon: const Icon(Icons.expand_more, size: 16, color: AppTheme.textMuted),
+                                icon: Icon(Icons.expand_more, size: 16,
+                                    color: AppTheme.textMuted(context)),
                                 items: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0].map((e) {
                                   return DropdownMenuItem(value: e, child: Text(
-                                    '${e.toInt()}', style: const TextStyle(
-                                      color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                                    '${e.toInt()}', style: TextStyle(
+                                      color: AppTheme.textPrimary(context),
+                                      fontWeight: FontWeight.w600),
                                   ));
                                 }).toList(),
                                 onChanged: (val) {
@@ -303,13 +323,12 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     ],
                   ),
                   const SizedBox(width: 16),
-                  // Total (editable)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('TOTAL', style: GoogleFonts.inter(
                         fontSize: 9, fontWeight: FontWeight.w700,
-                        color: AppTheme.textMuted, letterSpacing: 0.5,
+                        color: AppTheme.textMuted(context), letterSpacing: 0.5,
                       )),
                       const SizedBox(height: 4),
                       AnimatedContainer(
@@ -338,7 +357,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                               border: InputBorder.none,
                               isDense: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 6),
-                              hintStyle: GoogleFonts.inter(color: AppTheme.textMuted),
+                              hintStyle: GoogleFonts.inter(color: AppTheme.textMuted(context)),
                             ),
                             onChanged: (val) {
                               double d = double.tryParse(val) ?? 0;
@@ -356,12 +375,11 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                     ],
                   ),
                   const Spacer(),
-                  // Grade Badge
                   GradeBadge(grade: widget.course.grade),
                   const SizedBox(width: 12),
-                  // Delete
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppTheme.textMuted),
+                    icon: Icon(Icons.delete_outline_rounded, size: 20,
+                        color: AppTheme.textMuted(context)),
                     onPressed: () {
                       HapticFeedback.mediumImpact();
                       _notifier.removeCourse(widget.course.id);
@@ -381,13 +399,14 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     required TextEditingController controller,
     required FocusNode focusNode,
     required bool isFocused,
+    required bool isDark,
   }) {
     return Expanded(
       child: Column(
         children: [
           Text(label, style: GoogleFonts.inter(
             fontSize: 10, fontWeight: FontWeight.w700,
-            color: isFocused ? AppTheme.accentPrimary : AppTheme.textMuted,
+            color: isFocused ? AppTheme.accentPrimary : AppTheme.textMuted(context),
             letterSpacing: 0.5,
           )),
           const SizedBox(height: 6),
@@ -395,11 +414,9 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: isFocused ? const Color(0x1A6366F1) : const Color(0x0DFFFFFF),
+              color: _fieldBg(isDark, isFocused),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isFocused ? const Color(0x4D6366F1) : const Color(0x14FFFFFF),
-              ),
+              border: Border.all(color: _fieldBorder(isDark, isFocused)),
             ),
             child: TextField(
               controller: controller,
@@ -407,14 +424,15 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textPrimary,
+                fontSize: 14, fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary(context),
               ),
               decoration: InputDecoration(
                 hintText: '0',
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintStyle: GoogleFonts.inter(color: AppTheme.textMuted),
+                hintStyle: GoogleFonts.inter(color: AppTheme.textMuted(context)),
               ),
               onChanged: (val) {
                 double d = double.tryParse(val) ?? 0;

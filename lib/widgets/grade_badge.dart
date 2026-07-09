@@ -24,7 +24,7 @@ class GradeBadge extends StatelessWidget {
       case 'F':
         return AppTheme.danger;
       default:
-        return AppTheme.textMuted;
+        return AppTheme.darkTextMuted;
     }
   }
 
