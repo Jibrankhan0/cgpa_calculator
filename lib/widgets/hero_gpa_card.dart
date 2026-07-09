@@ -35,54 +35,52 @@ class HeroGpaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final gpaColor = AppTheme.getGpaColor(gpa);
 
-    return RepaintBoundary(
-      child: GlassCard(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            CircularProgressRing(
-              value: gpa,
-              color: gpaColor,
-              size: 88,
-              strokeWidth: 8,
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: _labelStyle.copyWith(
-                      color: AppTheme.textMuted(context),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    gpa.toStringAsFixed(2),
-                    style: _gpaStyle.copyWith(
-                      color: gpaColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Column(
+    return GlassCard(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          CircularProgressRing(
+            value: gpa,
+            color: gpaColor,
+            size: 88,
+            strokeWidth: 8,
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MiniStatCard(
-                  label: 'Credits',
-                  value: totalCredits.toStringAsFixed(1),
+                Text(
+                  label,
+                  style: _labelStyle.copyWith(
+                    color: AppTheme.textMuted(context),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                MiniStatCard(
-                  label: 'Courses',
-                  value: courseCount.toString(),
-                  valueColor: AppTheme.accentPrimary,
+                const SizedBox(height: 6),
+                Text(
+                  gpa.toStringAsFixed(2),
+                  style: _gpaStyle.copyWith(
+                    color: gpaColor,
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Column(
+            children: [
+              MiniStatCard(
+                label: 'Credits',
+                value: totalCredits.toStringAsFixed(1),
+              ),
+              const SizedBox(height: 8),
+              MiniStatCard(
+                label: 'Courses',
+                value: courseCount.toString(),
+                valueColor: AppTheme.accentPrimary,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

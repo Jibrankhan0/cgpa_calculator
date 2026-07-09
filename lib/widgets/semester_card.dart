@@ -120,87 +120,85 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
       return focused ? const Color(0x4D6366F1) : const Color(0x14000000);
     }
 
-    return RepaintBoundary(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: GlassCard(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(Icons.school_rounded, color: AppTheme.textMuted(context), size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 5,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(Icons.school_rounded, color: AppTheme.textMuted(context), size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 5,
+              child: TextField(
+                controller: _nameController,
+                focusNode: _nameFocus,
+                decoration: InputDecoration(
+                  hintText: 'Semester Name',
+                  border: InputBorder.none,
+                  hintStyle: _hintBase.copyWith(
+                    color: AppTheme.textMuted(context).withValues(alpha: 0.6),
+                  ),
+                ),
+                style: _nameStyleBase.copyWith(
+                  color: AppTheme.textPrimary(context),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              flex: 3,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: fieldBg(_isGpaFocused),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: fieldBorder(_isGpaFocused)),
+                ),
                 child: TextField(
-                  controller: _nameController,
-                  focusNode: _nameFocus,
+                  controller: _gpaController,
+                  focusNode: _gpaFocus,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  textAlign: TextAlign.center,
                   decoration: InputDecoration(
-                    hintText: 'Semester Name',
+                    hintText: 'GPA',
                     border: InputBorder.none,
-                    hintStyle: _hintBase.copyWith(
-                      color: AppTheme.textMuted(context).withValues(alpha: 0.6),
-                    ),
+                    isDense: true,
+                    hintStyle: _gpaHintBase.copyWith(color: AppTheme.textMuted(context)),
                   ),
-                  style: _nameStyleBase.copyWith(
-                    color: AppTheme.textPrimary(context),
+                  style: _gpaStyleBase.copyWith(
+                    color: AppTheme.accentPrimary,
                   ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 3,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: fieldBg(_isGpaFocused),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: fieldBorder(_isGpaFocused)),
-                  ),
-                  child: TextField(
-                    controller: _gpaController,
-                    focusNode: _gpaFocus,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      hintText: 'GPA',
-                      border: InputBorder.none,
-                      isDense: true,
-                      hintStyle: _gpaHintBase.copyWith(color: AppTheme.textMuted(context)),
-                    ),
-                    style: _gpaStyleBase.copyWith(
-                      color: AppTheme.accentPrimary,
-                    ),
-                    onChanged: (val) {
-                      _debounce?.cancel();
-                      _debounce = Timer(Duration(milliseconds: 300), () {
-                        double gpa = double.tryParse(val) ?? 0;
-                        if (gpa > 4.0) {
-                          gpa = 4.0;
-                          _gpaController.text = '4.0';
-                          _gpaController.selection = TextSelection.fromPosition(
-                            TextPosition(offset: _gpaController.text.length),
+                  onChanged: (val) {
+                    _debounce?.cancel();
+                    _debounce = Timer(Duration(milliseconds: 300), () {
+                      double gpa = double.tryParse(val) ?? 0;
+                      if (gpa > 4.0) {
+                        gpa = 4.0;
+                        _gpaController.text = '4.0';
+                        _gpaController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: _gpaController.text.length),
+                        );
+                      }
+                      ref.read(cgpaProvider.notifier).updateSemester(
+                            widget.semester.id,
+                            gpa: gpa,
                           );
-                        }
-                        ref.read(cgpaProvider.notifier).updateSemester(
-                              widget.semester.id,
-                              gpa: gpa,
-                            );
-                      });
-                    },
-                  ),
+                    });
+                  },
                 ),
               ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Icon(Icons.delete_outline_rounded, size: 20,
-                    color: AppTheme.textMuted(context)),
-                onPressed: () {
-                  HapticFeedback.mediumImpact();
-                  ref.read(cgpaProvider.notifier).removeSemester(widget.semester.id);
-                },
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              icon: Icon(Icons.delete_outline_rounded, size: 20,
+                  color: AppTheme.textMuted(context)),
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                ref.read(cgpaProvider.notifier).removeSemester(widget.semester.id);
+              },
+            ),
+          ],
         ),
       ),
     );

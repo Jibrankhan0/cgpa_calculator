@@ -12,16 +12,14 @@ class MeshGradientBackground extends StatelessWidget {
 
     return Stack(
       children: [
-        RepaintBoundary(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [AppTheme.darkBgGradientStart, AppTheme.darkBgPrimary]
-                    : [AppTheme.lightBgGradientStart, AppTheme.lightBgPrimary],
-              ),
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [AppTheme.darkBgGradientStart, AppTheme.darkBgPrimary]
+                  : [AppTheme.lightBgGradientStart, AppTheme.lightBgPrimary],
             ),
           ),
         ),
