@@ -71,19 +71,19 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
       }
     });
     _midFocus.addListener(() {
-      setState(() => _isMidFocused = _midFocus.hasFocus);
+      _isMidFocused = _midFocus.hasFocus;
       _onMarksFocusLost('mid');
     });
     _finalFocus.addListener(() {
-      setState(() => _isFinalFocused = _finalFocus.hasFocus);
+      _isFinalFocused = _finalFocus.hasFocus;
       _onMarksFocusLost('final');
     });
     _sessionalFocus.addListener(() {
-      setState(() => _isSessionalFocused = _sessionalFocus.hasFocus);
+      _isSessionalFocused = _sessionalFocus.hasFocus;
       _onMarksFocusLost('sessional');
     });
     _totalFocus.addListener(() {
-      setState(() => _isTotalFocused = _totalFocus.hasFocus);
+      _isTotalFocused = _totalFocus.hasFocus;
       if (!_totalFocus.hasFocus) {
         double val = double.tryParse(_totalController.text) ?? 0;
         if (val > 100) val = 100;
@@ -198,8 +198,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                           creditHours: !isLab ? 1.0 : widget.course.creditHours);
                       HapticFeedback.lightImpact();
                     },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
+                    child: Container(
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
@@ -331,8 +330,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                         color: AppTheme.textMuted(context), letterSpacing: 0.5,
                       )),
                       const SizedBox(height: 4),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                      Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: _isTotalFocused ? const Color(0x266366F1) : const Color(0x196366F1),
@@ -410,8 +408,7 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
             letterSpacing: 0.5,
           )),
           const SizedBox(height: 6),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
               color: _fieldBg(isDark, isFocused),

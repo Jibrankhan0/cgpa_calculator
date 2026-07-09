@@ -34,8 +34,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final selectedIndex = ref.watch(
       semesterProvider.select((s) => s.selectedIndex),
     );
-    final semester = ref.watch(
-      semesterProvider.select((s) => s.semesters[selectedIndex]),
+    final courseCount = ref.watch(
+      semesterProvider.select((s) => s.semesters[selectedIndex].courses.length),
+    );
+    final courses = ref.watch(
+      semesterProvider.select((s) => s.semesters[selectedIndex].courses),
     );
     final cgpaSemesters = ref.watch(
       cgpaProvider.select((s) => s.semesters),
@@ -132,7 +135,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ? 'OVERALL CGPA'
                   : 'SEMESTER GPA',
               totalCredits: stats.totalCredits,
-              courseCount: semester.courses.length,
+              courseCount: courseCount,
             ),
             const SizedBox(height: 24),
             Text(
@@ -160,14 +163,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }),
             ] else ...[
-              if (semester.courses.isEmpty)
+              if (courses.isEmpty)
                 const EmptyState(
                   icon: Icons.book_outlined,
                   title: 'No courses yet',
                   subtitle: 'Add your first course to start calculating',
                 )
               else
-                ...semester.courses.map((entry) {
+                ...courses.map((entry) {
                   return CourseInputCard(
                     key: ValueKey(entry.id),
                     course: entry,

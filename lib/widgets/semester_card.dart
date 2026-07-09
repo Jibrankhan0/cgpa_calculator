@@ -43,7 +43,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
     });
 
     _gpaFocus.addListener(() {
-      setState(() => _isGpaFocused = _gpaFocus.hasFocus);
+      _isGpaFocused = _gpaFocus.hasFocus;
       if (!_gpaFocus.hasFocus) {
         double gpa = double.tryParse(_gpaController.text) ?? 0;
         if (gpa > 4.0) {
@@ -129,8 +129,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
               const SizedBox(width: 12),
               Expanded(
                 flex: 3,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
+                child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: fieldBg(_isGpaFocused),
