@@ -46,6 +46,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final selectedIndex = ref.watch(
       semesterProvider.select((s) => s.selectedIndex),
     );
+    final courseCount = ref.watch(
+      semesterProvider.select((s) => s.semesters[selectedIndex].courses.length),
+    );
     final courses = ref.watch(
       semesterProvider.select((s) => s.semesters[selectedIndex].courses),
     );
@@ -54,8 +57,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
     final stats = ref.watch(gpaStatsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final isCgpaMode = mode == CalculationMode.cgpa;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -119,147 +120,117 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: MeshGradientBackground(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  ModeSelector(
-                    currentMode: mode,
-                    onChanged: (m) => ref.read(semesterProvider.notifier).setMode(m),
-                  ),
-                  const SizedBox(height: 20),
-                  HeroGpaCard(
-                    gpa: isCgpaMode ? stats.cgpa : stats.semesterGpa,
-                    label: isCgpaMode ? 'OVERALL CGPA' : 'SEMESTER GPA',
-                    totalCredits: stats.totalCredits,
-                    courseCount: isCgpaMode ? cgpaSemesters.length : courses.length,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'SEMESTERS',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.textMuted(context),
-                      letterSpacing: 1.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                ]),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [
+            const SizedBox(height: 16),
+            ModeSelector(
+              currentMode: mode,
+              onChanged: (m) => ref.read(semesterProvider.notifier).setMode(m),
+            ),
+            const SizedBox(height: 20),
+            HeroGpaCard(
+              gpa: mode == CalculationMode.cgpa
+                  ? stats.cgpa
+                  : stats.semesterGpa,
+              label: mode == CalculationMode.cgpa
+                  ? 'OVERALL CGPA'
+                  : 'SEMESTER GPA',
+              totalCredits: stats.totalCredits,
+              courseCount: courseCount,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'SEMESTERS',
+              style: TextStyle(
+                fontSize: 11,
+                color: AppTheme.textMuted(context),
+                letterSpacing: 1.5,
+                fontWeight: FontWeight.w800,
               ),
             ),
-            if (isCgpaMode)
+            const SizedBox(height: 12),
+            if (mode == CalculationMode.cgpa) ...[
               if (cgpaSemesters.isEmpty)
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
-                      child: EmptyState(
-                        icon: Icons.school_outlined,
-                        title: 'No semesters yet',
-                        subtitle: 'Add your first semester to start calculating',
-                      ),
-                    ),
-                  ),
+                const EmptyState(
+                  icon: Icons.school_outlined,
+                  title: 'No semesters yet',
+                  subtitle: 'Add your first semester to start calculating',
                 )
               else
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverList.builder(
-                    itemCount: cgpaSemesters.length,
-                    itemBuilder: (context, index) {
-                      return SemesterCard(
-                        key: ValueKey(cgpaSemesters[index].id),
-                        semester: cgpaSemesters[index],
-                      );
-                    },
-                  ),
-                )
-            else
+                ...cgpaSemesters.map((entry) {
+                  return SemesterCard(
+                    key: ValueKey(entry.id),
+                    semester: entry,
+                  );
+                }),
+            ] else ...[
               if (courses.isEmpty)
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
-                      child: EmptyState(
-                        icon: Icons.book_outlined,
-                        title: 'No courses yet',
-                        subtitle: 'Add your first course to start calculating',
-                      ),
-                    ),
-                  ),
+                const EmptyState(
+                  icon: Icons.book_outlined,
+                  title: 'No courses yet',
+                  subtitle: 'Add your first course to start calculating',
                 )
               else
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverList.builder(
-                    itemCount: courses.length,
-                    itemBuilder: (context, index) {
-                      return CourseInputCard(
-                        key: ValueKey(courses[index].id),
-                        course: courses[index],
-                        notifierOverride: ref.read(semesterProvider.notifier),
-                      );
-                    },
+                ...courses.map((entry) {
+                  return CourseInputCard(
+                    key: ValueKey(entry.id),
+                    course: entry,
+                  );
+                }),
+            ],
+            const SizedBox(height: 20),
+            GradientButton(
+              onPressed: () {
+                if (mode == CalculationMode.cgpa) {
+                  ref.read(cgpaProvider.notifier).addSemester();
+                } else {
+                  ref.read(semesterProvider.notifier).addCourse(selectedIndex);
+                }
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'ADD',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                      fontSize: 13,
+                    ),
                   ),
-                ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    GradientButton(
-                      onPressed: () {
-                        if (isCgpaMode) {
-                          ref.read(cgpaProvider.notifier).addSemester();
-                        } else {
-                          ref.read(semesterProvider.notifier).addCourse(selectedIndex);
-                        }
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'ADD',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Developed by',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: AppTheme.textMuted(context),
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'JIBRAN KHAN DEHPAL',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.textSecondary(context),
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
+            const SizedBox(height: 24),
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Developed by',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppTheme.textMuted(context),
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'JIBRAN KHAN DEHPAL',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textSecondary(context),
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
