@@ -63,6 +63,26 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final semCount = ref.read(marksSheetProvider).semesters.length;
+    if (_tabController == null || _tabController!.length != semCount) {
+      final oldIndex = _tabController?.index ?? ref.read(marksSheetProvider).selectedIndex;
+      _tabController?.dispose();
+      _tabController = TabController(
+        length: semCount,
+        vsync: this,
+        initialIndex: oldIndex.clamp(0, semCount - 1),
+      );
+      _tabController!.addListener(() {
+        if (!_tabController!.indexIsChanging) {
+          ref.read(marksSheetProvider.notifier).selectSemester(_tabController!.index);
+        }
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _tabController?.dispose();
     super.dispose();
@@ -79,22 +99,7 @@ class _MarksSheetScreenState extends ConsumerState<MarksSheetScreen>
     final semesterNames = ref.watch(
       marksSheetProvider.select((s) => s.semesters.map((x) => x.name).toList()),
     );
-    if (_tabController == null || _tabController!.length != semCount) {
-      final oldIndex = _tabController?.index ?? semesterSelectedIndex;
-      _tabController?.dispose();
-      _tabController = TabController(
-        length: semCount,
-        vsync: this,
-        initialIndex: oldIndex.clamp(0, semCount - 1),
-      );
-      _tabController!.addListener(() {
-        if (!_tabController!.indexIsChanging) {
-          ref
-              .read(marksSheetProvider.notifier)
-              .selectSemester(_tabController!.index);
-        }
-      });
-    } else if (_tabController!.index != semesterSelectedIndex) {
+    if (_tabController != null && _tabController!.index != semesterSelectedIndex) {
       _tabController!.animateTo(semesterSelectedIndex);
     }
 
