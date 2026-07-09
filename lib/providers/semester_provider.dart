@@ -55,6 +55,12 @@ final semesterProvider = NotifierProvider<SemesterNotifier, SemesterState>(() {
 class SemesterNotifier extends Notifier<SemesterState> {
   String get storageKey => 'semester_cache_v1';
   Timer? _saveTimer;
+  SharedPreferences? _prefs;
+
+  Future<SharedPreferences> _getPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
 
   @override
   SemesterState build() {
@@ -79,7 +85,7 @@ class SemesterNotifier extends Notifier<SemesterState> {
 
   Future<void> loadFromLocal() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await _getPrefs();
       final data = prefs.getString(storageKey);
       if (data != null) {
         state = SemesterState.fromJson(jsonDecode(data));
@@ -92,7 +98,7 @@ class SemesterNotifier extends Notifier<SemesterState> {
   void _save() {
     _saveTimer?.cancel();
     _saveTimer = Timer(const Duration(milliseconds: 500), () async {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await _getPrefs();
       await prefs.setString(storageKey, jsonEncode(state.toJson()));
     });
   }
@@ -288,6 +294,12 @@ final cgpaProvider = NotifierProvider<CgpaNotifier, CgpaState>(() {
 class CgpaNotifier extends Notifier<CgpaState> {
   String get storageKey => 'cgpa_cache_v1';
   Timer? _saveTimer;
+  SharedPreferences? _prefs;
+
+  Future<SharedPreferences> _getPrefs() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!;
+  }
 
   @override
   CgpaState build() {
@@ -305,7 +317,7 @@ class CgpaNotifier extends Notifier<CgpaState> {
 
   Future<void> loadFromLocal() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await _getPrefs();
       final data = prefs.getString(storageKey);
       if (data != null) {
         state = CgpaState.fromJson(jsonDecode(data));
@@ -318,7 +330,7 @@ class CgpaNotifier extends Notifier<CgpaState> {
   void _save() {
     _saveTimer?.cancel();
     _saveTimer = Timer(const Duration(milliseconds: 500), () async {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = await _getPrefs();
       await prefs.setString(storageKey, jsonEncode(state.toJson()));
     });
   }
