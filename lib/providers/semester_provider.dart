@@ -65,6 +65,9 @@ class SemesterNotifier extends Notifier<SemesterState> {
 
   @override
   SemesterState build() {
+    ref.onDispose(() {
+      _saveTimer?.cancel();
+    });
     return SemesterState(
       semesters: [
         Semester(
@@ -304,6 +307,9 @@ class CgpaNotifier extends Notifier<CgpaState> {
 
   @override
   CgpaState build() {
+    ref.onDispose(() {
+      _saveTimer?.cancel();
+    });
     return CgpaState(
       semesters: [
         SemesterResult(
@@ -408,6 +414,9 @@ class MarksSheetNotifier extends SemesterNotifier {
 
   @override
   SemesterState build() {
+    ref.onDispose(() {
+      _saveTimer?.cancel();
+    });
     return SemesterState(
       semesters: [
         Semester(
