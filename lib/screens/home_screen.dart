@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../models/course.dart';
+import '../models/semester_result.dart';
 import '../providers/semester_provider.dart';
 import '../providers/theme_provider.dart';
 import '../theme/app_theme.dart';
@@ -34,10 +36,173 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     fontWeight: FontWeight.w300,
   );
 
+  late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     Future.microtask(() => ref.read(semesterProvider.notifier).loadFromLocal());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  int _getItemCount(CalculationMode mode, List<SemesterResult> cgpaSemesters, List<Course> courses) {
+    // Header items: spacer + ModeSelector + spacer + HeroGpaCard + spacer + section header + spacer
+    int count = 7;
+    
+    if (mode == CalculationMode.cgpa) {
+      count += cgpaSemesters.isEmpty ? 1 : cgpaSemesters.length;
+    } else {
+      count += courses.isEmpty ? 1 : courses.length;
+    }
+    
+    // Footer items: spacer + Button + spacer + footer text + spacer
+    count += 7;
+    
+    return count;
+  }
+
+  Widget _buildItem(
+    int index,
+    CalculationMode mode,
+    int selectedIndex,
+    int courseCount,
+    List<Course> courses,
+    List<SemesterResult> cgpaSemesters,
+    GpaStats stats,
+    bool isDark,
+  ) {
+    // Header items
+    if (index == 0) return const SizedBox(height: 16);
+    if (index == 1) {
+      return ModeSelector(
+        currentMode: mode,
+        onChanged: (m) => ref.read(semesterProvider.notifier).setMode(m),
+      );
+    }
+    if (index == 2) return const SizedBox(height: 20);
+    if (index == 3) {
+      return HeroGpaCard(
+        gpa: mode == CalculationMode.cgpa ? stats.cgpa : stats.semesterGpa,
+        label: mode == CalculationMode.cgpa ? 'OVERALL CGPA' : 'SEMESTER GPA',
+        totalCredits: stats.totalCredits,
+        courseCount: courseCount,
+      );
+    }
+    if (index == 4) return const SizedBox(height: 24);
+    if (index == 5) {
+      return Text(
+        'SEMESTERS',
+        style: TextStyle(
+          fontSize: 11,
+          color: AppTheme.textMuted(context),
+          letterSpacing: 1.5,
+          fontWeight: FontWeight.w800,
+        ),
+      );
+    }
+    if (index == 6) return const SizedBox(height: 12);
+
+    // Content items
+    int contentIndex = index - 7;
+    int contentCount = mode == CalculationMode.cgpa ? cgpaSemesters.length : courses.length;
+
+    if (contentCount == 0) {
+      if (contentIndex == 0) {
+        return EmptyState(
+          icon: mode == CalculationMode.cgpa ? Icons.school_outlined : Icons.book_outlined,
+          title: mode == CalculationMode.cgpa ? 'No semesters yet' : 'No courses yet',
+          subtitle: mode == CalculationMode.cgpa
+              ? 'Add your first semester to start calculating'
+              : 'Add your first course to start calculating',
+        );
+      }
+    } else {
+      if (contentIndex < contentCount) {
+        if (mode == CalculationMode.cgpa) {
+          final entry = cgpaSemesters[contentIndex];
+          return SemesterCard(
+            key: ValueKey(entry.id),
+            semester: entry,
+          );
+        } else {
+          final entry = courses[contentIndex];
+          return CourseInputCard(
+            key: ValueKey(entry.id),
+            course: entry,
+          );
+        }
+      }
+      contentIndex -= contentCount;
+    }
+
+    // Footer items
+    int footerIndex = contentIndex;
+    if (contentCount == 0) footerIndex -= 1; // Account for empty state
+    
+    if (footerIndex == 0) return const SizedBox(height: 20);
+    if (footerIndex == 1) {
+      return GradientButton(
+        onPressed: () {
+          if (mode == CalculationMode.cgpa) {
+            ref.read(cgpaProvider.notifier).addSemester();
+          } else {
+            ref.read(semesterProvider.notifier).addCourse(selectedIndex);
+          }
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            Icon(Icons.add_rounded, color: Colors.white, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'ADD',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    if (footerIndex == 2) return const SizedBox(height: 24);
+    if (footerIndex == 3) {
+      return Center(
+        child: Column(
+          children: [
+            Text(
+              'Developed by',
+              style: TextStyle(
+                fontSize: 10,
+                color: AppTheme.textMuted(context),
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'JIBRAN KHAN DEHPAL',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textSecondary(context),
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    if (footerIndex == 4) return const SizedBox(height: 32);
+
+    return const SizedBox.shrink();
   }
 
   @override
@@ -120,118 +285,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: MeshGradientBackground(
-        child: ListView(
+        child: ListView.builder(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          children: [
-            const SizedBox(height: 16),
-            ModeSelector(
-              currentMode: mode,
-              onChanged: (m) => ref.read(semesterProvider.notifier).setMode(m),
-            ),
-            const SizedBox(height: 20),
-            HeroGpaCard(
-              gpa: mode == CalculationMode.cgpa
-                  ? stats.cgpa
-                  : stats.semesterGpa,
-              label: mode == CalculationMode.cgpa
-                  ? 'OVERALL CGPA'
-                  : 'SEMESTER GPA',
-              totalCredits: stats.totalCredits,
-              courseCount: courseCount,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'SEMESTERS',
-              style: TextStyle(
-                fontSize: 11,
-                color: AppTheme.textMuted(context),
-                letterSpacing: 1.5,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 12),
-            if (mode == CalculationMode.cgpa) ...[
-              if (cgpaSemesters.isEmpty)
-                const EmptyState(
-                  icon: Icons.school_outlined,
-                  title: 'No semesters yet',
-                  subtitle: 'Add your first semester to start calculating',
-                )
-              else
-                ...cgpaSemesters.map((entry) {
-                  return SemesterCard(
-                    key: ValueKey(entry.id),
-                    semester: entry,
-                  );
-                }),
-            ] else ...[
-              if (courses.isEmpty)
-                const EmptyState(
-                  icon: Icons.book_outlined,
-                  title: 'No courses yet',
-                  subtitle: 'Add your first course to start calculating',
-                )
-              else
-                ...courses.map((entry) {
-                  return CourseInputCard(
-                    key: ValueKey(entry.id),
-                    course: entry,
-                  );
-                }),
-            ],
-            const SizedBox(height: 20),
-            GradientButton(
-              onPressed: () {
-                if (mode == CalculationMode.cgpa) {
-                  ref.read(cgpaProvider.notifier).addSemester();
-                } else {
-                  ref.read(semesterProvider.notifier).addCourse(selectedIndex);
-                }
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'ADD',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: Column(
-                children: [
-                  Text(
-                    'Developed by',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: AppTheme.textMuted(context),
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'JIBRAN KHAN DEHPAL',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textSecondary(context),
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-          ],
+          itemCount: _getItemCount(mode, cgpaSemesters, courses),
+          itemBuilder: (context, index) {
+            return _buildItem(index, mode, selectedIndex, courseCount, courses, cgpaSemesters, stats, isDark);
+          },
         ),
       ),
     );
