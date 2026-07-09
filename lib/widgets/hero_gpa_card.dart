@@ -33,8 +33,8 @@ class HeroGpaCard extends StatelessWidget {
             CircularProgressRing(
               value: gpa,
               color: gpaColor,
-              size: 90,
-              strokeWidth: 7,
+              size: 88,
+              strokeWidth: 8,
             ),
             const SizedBox(width: 20),
             // GPA Number
@@ -43,7 +43,7 @@ class HeroGpaCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    label.toUpperCase(),
+                    label,
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
@@ -51,11 +51,11 @@ class HeroGpaCard extends StatelessWidget {
                       letterSpacing: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     gpa.toStringAsFixed(2),
                     style: GoogleFonts.lexend(
-                      fontSize: 48,
+                      fontSize: 44,
                       fontWeight: FontWeight.bold,
                       color: gpaColor,
                       height: 1,

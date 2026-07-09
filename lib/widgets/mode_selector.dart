@@ -20,7 +20,7 @@ class ModeSelector extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: const Color(0x0DFFFFFF),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0x14FFFFFF)),
       ),
       child: Row(
@@ -41,7 +41,7 @@ class ModeSelector extends StatelessWidget {
           onChanged(mode);
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
@@ -50,13 +50,13 @@ class ModeSelector extends StatelessWidget {
                     colors: [AppTheme.accentPrimary, AppTheme.accentSecondary],
                   )
                 : null,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: isSelected
-                ? [
+                ? const [
                     BoxShadow(
-                      color: const Color(0x4D6366F1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      color: Color(0x4D6366F1),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
                     ),
                   ]
                 : null,

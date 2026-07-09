@@ -16,7 +16,14 @@ class CGPACalculatorApp extends StatelessWidget {
       title: 'MCKRU CGPA Calculator',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
+      themeMode: ThemeMode.dark,
       home: const SplashScreen(),
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+          child: child!,
+        );
+      },
     );
   }
 }

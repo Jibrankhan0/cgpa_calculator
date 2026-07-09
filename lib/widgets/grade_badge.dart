@@ -14,13 +14,13 @@ class GradeBadge extends StatelessWidget {
       case 'B+':
       case 'B':
       case 'B-':
-        return const Color(0xFF3B82F6); // Blue
+        return const Color(0xFF3B82F6);
       case 'C+':
       case 'C':
         return AppTheme.warning;
       case 'C-':
       case 'D':
-        return const Color(0xFFF97316); // Orange
+        return const Color(0xFFF97316);
       case 'F':
         return AppTheme.danger;
       default:
@@ -32,7 +32,7 @@ class GradeBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _getGradeColor();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
@@ -41,7 +41,7 @@ class GradeBadge extends StatelessWidget {
       child: Text(
         grade,
         style: TextStyle(
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: FontWeight.w800,
           color: color,
         ),

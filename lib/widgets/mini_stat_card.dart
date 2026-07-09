@@ -17,10 +17,10 @@ class MiniStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0x0AFFFFFF),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0x14FFFFFF)),
       ),
       child: Column(
@@ -39,7 +39,7 @@ class MiniStatCard extends StatelessWidget {
           Text(
             value,
             style: GoogleFonts.lexend(
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.w700,
               color: valueColor ?? AppTheme.textPrimary,
             ),

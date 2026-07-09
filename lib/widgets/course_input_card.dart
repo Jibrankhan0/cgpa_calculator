@@ -30,6 +30,11 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
   late FocusNode _sessionalFocus;
   late FocusNode _totalFocus;
 
+  bool _isMidFocused = false;
+  bool _isFinalFocused = false;
+  bool _isSessionalFocused = false;
+  bool _isTotalFocused = false;
+
   SemesterNotifier get _notifier =>
       widget.notifierOverride ?? ref.read(semesterProvider.notifier);
 
@@ -65,10 +70,20 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
         _notifier.updateCourse(widget.course.id, name: _nameController.text);
       }
     });
-    _midFocus.addListener(() => _onMarksFocusLost('mid'));
-    _finalFocus.addListener(() => _onMarksFocusLost('final'));
-    _sessionalFocus.addListener(() => _onMarksFocusLost('sessional'));
+    _midFocus.addListener(() {
+      setState(() => _isMidFocused = _midFocus.hasFocus);
+      _onMarksFocusLost('mid');
+    });
+    _finalFocus.addListener(() {
+      setState(() => _isFinalFocused = _finalFocus.hasFocus);
+      _onMarksFocusLost('final');
+    });
+    _sessionalFocus.addListener(() {
+      setState(() => _isSessionalFocused = _sessionalFocus.hasFocus);
+      _onMarksFocusLost('sessional');
+    });
     _totalFocus.addListener(() {
+      setState(() => _isTotalFocused = _totalFocus.hasFocus);
       if (!_totalFocus.hasFocus) {
         double val = double.tryParse(_totalController.text) ?? 0;
         if (val > 100) val = 100;
@@ -167,7 +182,8 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                           creditHours: !isLab ? 1.0 : widget.course.creditHours);
                       HapticFeedback.lightImpact();
                     },
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
@@ -212,11 +228,26 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
               // Middle Row: Marks fields
               Row(
                 children: [
-                  _buildMarkField(label: 'MID', controller: _midController, focusNode: _midFocus),
+                  _buildMarkField(
+                    label: 'MID',
+                    controller: _midController,
+                    focusNode: _midFocus,
+                    isFocused: _isMidFocused,
+                  ),
                   const SizedBox(width: 10),
-                  _buildMarkField(label: 'FINAL', controller: _finalController, focusNode: _finalFocus),
+                  _buildMarkField(
+                    label: 'FINAL',
+                    controller: _finalController,
+                    focusNode: _finalFocus,
+                    isFocused: _isFinalFocused,
+                  ),
                   const SizedBox(width: 10),
-                  _buildMarkField(label: 'SES.', controller: _sessionalController, focusNode: _sessionalFocus),
+                  _buildMarkField(
+                    label: 'SES.',
+                    controller: _sessionalController,
+                    focusNode: _sessionalFocus,
+                    isFocused: _isSessionalFocused,
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -281,12 +312,15 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
                         color: AppTheme.textMuted, letterSpacing: 0.5,
                       )),
                       const SizedBox(height: 4),
-                      Container(
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0x196366F1),
+                          color: _isTotalFocused ? const Color(0x266366F1) : const Color(0x196366F1),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0x336366F1)),
+                          border: Border.all(
+                            color: _isTotalFocused ? const Color(0x4D6366F1) : const Color(0x336366F1),
+                          ),
                         ),
                         child: SizedBox(
                           width: 42,
@@ -346,21 +380,26 @@ class _CourseInputCardState extends ConsumerState<CourseInputCard> {
     required String label,
     required TextEditingController controller,
     required FocusNode focusNode,
+    required bool isFocused,
   }) {
     return Expanded(
       child: Column(
         children: [
           Text(label, style: GoogleFonts.inter(
             fontSize: 10, fontWeight: FontWeight.w700,
-            color: AppTheme.textMuted, letterSpacing: 0.5,
+            color: isFocused ? AppTheme.accentPrimary : AppTheme.textMuted,
+            letterSpacing: 0.5,
           )),
           const SizedBox(height: 6),
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0x0DFFFFFF),
+              color: isFocused ? const Color(0x1A6366F1) : const Color(0x0DFFFFFF),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0x14FFFFFF)),
+              border: Border.all(
+                color: isFocused ? const Color(0x4D6366F1) : const Color(0x14FFFFFF),
+              ),
             ),
             child: TextField(
               controller: controller,

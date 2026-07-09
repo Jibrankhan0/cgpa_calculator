@@ -21,6 +21,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
   late TextEditingController _gpaController;
   late FocusNode _nameFocus;
   late FocusNode _gpaFocus;
+  bool _isGpaFocused = false;
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
     });
 
     _gpaFocus.addListener(() {
+      setState(() => _isGpaFocused = _gpaFocus.hasFocus);
       if (!_gpaFocus.hasFocus) {
         double gpa = double.tryParse(_gpaController.text) ?? 0;
         if (gpa > 4.0) {
@@ -115,12 +117,15 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
               const SizedBox(width: 12),
               Expanded(
                 flex: 3,
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0x0DFFFFFF),
+                    color: _isGpaFocused ? const Color(0x1A6366F1) : const Color(0x0DFFFFFF),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0x14FFFFFF)),
+                    border: Border.all(
+                      color: _isGpaFocused ? const Color(0x4D6366F1) : const Color(0x14FFFFFF),
+                    ),
                   ),
                   child: TextField(
                     controller: _gpaController,

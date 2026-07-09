@@ -22,7 +22,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   static const _sectionLabelStyle = TextStyle(
-    fontSize: 12,
+    fontSize: 11,
     color: AppTheme.textMuted,
     letterSpacing: 1.5,
     fontWeight: FontWeight.w800,
@@ -58,8 +58,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 40,
-              width: 40,
+              height: 36,
+              width: 36,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -74,7 +74,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Image.asset('assets/logo2.png', fit: BoxFit.contain),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Text(
               'GPA',
               style: GoogleFonts.lexend(
@@ -114,12 +114,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             ModeSelector(
               currentMode: mode,
               onChanged: (m) => ref.read(semesterProvider.notifier).setMode(m),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             HeroGpaCard(
               gpa: mode == CalculationMode.cgpa
                   ? stats.cgpa
@@ -130,9 +130,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               totalCredits: stats.totalCredits,
               courseCount: semester.courses.length,
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
             const Text('SEMESTERS', style: _sectionLabelStyle),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             if (mode == CalculationMode.cgpa) ...[
               if (cgpaSemesters.isEmpty)
                 const EmptyState(
@@ -162,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   );
                 }),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             GradientButton(
               onPressed: () {
                 if (mode == CalculationMode.cgpa) {
@@ -174,7 +174,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Icon(Icons.add_rounded, color: Colors.white),
+                  Icon(Icons.add_rounded, color: Colors.white, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'ADD',
@@ -182,12 +182,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1,
+                      fontSize: 13,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             Center(
               child: Column(
                 children: const [
@@ -212,7 +213,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
           ],
         ),
       ),

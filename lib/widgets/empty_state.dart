@@ -17,32 +17,44 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: 64,
-            color: const Color(0x6694A3B8),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: GoogleFonts.lexend(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0x0D6366F1),
+                border: Border.all(color: const Color(0x1A6366F1)),
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: AppTheme.accentPrimary.withAlpha(180),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: AppTheme.textMuted,
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: GoogleFonts.lexend(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textSecondary,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: AppTheme.textMuted,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
