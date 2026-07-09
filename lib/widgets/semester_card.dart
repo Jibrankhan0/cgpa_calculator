@@ -17,6 +17,26 @@ class SemesterCard extends ConsumerStatefulWidget {
 }
 
 class _SemesterCardState extends ConsumerState<SemesterCard> {
+  // Cached GoogleFonts base TextStyles — avoids re-resolving font family on every build.
+  // Dynamic colors are applied via .copyWith() at usage sites.
+  static final _hintBase = GoogleFonts.inter(
+    fontSize: 14,
+  );
+
+  static final _nameStyleBase = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
+
+  static final _gpaHintBase = GoogleFonts.inter(
+    fontSize: 13,
+  );
+
+  static final _gpaStyleBase = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w800,
+  );
+
   late TextEditingController _nameController;
   late TextEditingController _gpaController;
   late FocusNode _nameFocus;
@@ -114,14 +134,11 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
                   decoration: InputDecoration(
                     hintText: 'Semester Name',
                     border: InputBorder.none,
-                    hintStyle: GoogleFonts.inter(
+                    hintStyle: _hintBase.copyWith(
                       color: AppTheme.textMuted(context).withValues(alpha: 0.6),
-                      fontSize: 14,
                     ),
                   ),
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  style: _nameStyleBase.copyWith(
                     color: AppTheme.textPrimary(context),
                   ),
                 ),
@@ -145,12 +162,10 @@ class _SemesterCardState extends ConsumerState<SemesterCard> {
                       hintText: 'GPA',
                       border: InputBorder.none,
                       isDense: true,
-                      hintStyle: GoogleFonts.inter(color: AppTheme.textMuted(context), fontSize: 13),
+                      hintStyle: _gpaHintBase.copyWith(color: AppTheme.textMuted(context)),
                     ),
-                    style: GoogleFonts.inter(
+                    style: _gpaStyleBase.copyWith(
                       color: AppTheme.accentPrimary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
                     ),
                     onChanged: (val) {
                       double gpa = double.tryParse(val) ?? 0;
