@@ -38,7 +38,7 @@ class EmptyState extends StatelessWidget {
               height: 72,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDark ? const Color(0x0D6366F1) : const Color(0x0D6366F1),
+                color: const Color(0x0D6366F1),
                 border: Border.all(
                   color: isDark ? const Color(0x1A6366F1) : const Color(0x1A6366F1),
                 ),
