@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_data.dart';
 import '../theme/app_theme.dart';
-import 'home_screen.dart';
+import 'onboarding_screen.dart';
+import 'main_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,179 +13,140 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _logoController;
-  late AnimationController _textController;
-  late Animation<double> _logoScale;
-  late Animation<double> _logoOpacity;
-  late Animation<double> _textOpacity;
-  late Animation<double> _textSlide;
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnim;
+  late Animation<double> _opacityAnim;
 
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+    _scaleAnim = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+    ));
+    _opacityAnim = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.4),
+    ));
+    _controller.forward();
 
-    _logoController = AnimationController(
-      duration: const Duration(milliseconds: 700),
-      vsync: this,
-    );
-
-    _textController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    );
-
-    _logoScale = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
-    );
-
-    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _logoController, curve: Curves.easeOut),
-    );
-
-    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
-    );
-
-    _textSlide = Tween<double>(begin: 10.0, end: 0.0).animate(
-      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
-    );
-
-    _startAnimation();
-  }
-
-  Future<void> _startAnimation() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _logoController.forward();
-    await Future.delayed(const Duration(milliseconds: 400));
-    _textController.forward();
-    await Future.delayed(const Duration(milliseconds: 1800));
-
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HomeScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        ),
-      );
-    }
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (!mounted) return;
+      final data = context.read<AppData>();
+      if (data.hasSeenOnboarding) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const MainShell()),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
-    _logoController.dispose();
-    _textController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final p = Palette.of(context);
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [AppTheme.darkBgGradientStart, AppTheme.darkBgPrimary]
-                : [AppTheme.lightBgGradientStart, AppTheme.lightBgPrimary],
+      backgroundColor: p.bg,
+      body: Stack(
+        children: [
+          Center(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) => Opacity(
+                opacity: _opacityAnim.value,
+                child: Transform.scale(scale: _scaleAnim.value, child: child),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : p.accentSoft,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/logo for calculatot.svg',
+                      width: 52,
+                      height: 52,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'CGPA Calculator',
+                    style: TextStyle(
+                        fontSize: 26, fontWeight: FontWeight.w800, color: p.fg, letterSpacing: -0.52),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'MCKRU · VERSION 1.3.0',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: p.muted,
+                      letterSpacing: 1.8,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    width: 150,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: 0.64),
+                      duration: const Duration(milliseconds: 1200),
+                      curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+                      builder: (context, value, _) => ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: SizedBox(
+                          height: 4,
+                          child: Stack(
+                            children: [
+                              Container(height: 4, color: p.border),
+                              FractionallySizedBox(
+                                widthFactor: value,
+                                child: Container(height: 4, color: p.accent),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Loading your saved record…',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: p.muted),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedBuilder(
-              animation: _logoController,
-              builder: (context, child) {
-                return Opacity(
-                  opacity: _logoOpacity.value,
-                  child: Transform.scale(
-                    scale: _logoScale.value,
-                    child: Container(
-                      height: 100,
-                      width: 100,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x4D6366F1),
-                            blurRadius: 30,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/logo2.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 28,
+            child: Text(
+              'Developed by Jibran Khan Dehpal',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: p.muted),
             ),
-            const SizedBox(height: 32),
-            AnimatedBuilder(
-              animation: _textController,
-              builder: (context, child) {
-                return Opacity(
-                  opacity: _textOpacity.value,
-                  child: Transform.translate(
-                    offset: Offset(0, _textSlide.value),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'GPA',
-                              style: GoogleFonts.lexend(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w900,
-                                color: AppTheme.textPrimary(context),
-                                letterSpacing: 3,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'CALCULATOR',
-                              style: GoogleFonts.lexend(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w300,
-                                color: AppTheme.textMuted(context),
-                                letterSpacing: 3,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'MCKRU University',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.accentPrimary,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

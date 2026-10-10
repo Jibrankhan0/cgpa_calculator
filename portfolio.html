@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCKRU CGPA Calculator — Jibran Khan Dehpal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: rgba(255,255,255,0.03);
+            --bg-card-hover: rgba(255,255,255,0.06);
+            --border: rgba(255,255,255,0.08);
+            --border-hover: rgba(255,255,255,0.15);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #555570;
+            --accent-1: #6366f1;
+            --accent-2: #a855f7;
+            --accent-3: #ec4899;
+            --accent-glow: rgba(99,102,241,0.15);
+            --green: #10b981;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --cyan: #06b6d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ===== BACKGROUND EFFECTS ===== */
+        .bg-effects {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .bg-effects::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 20s ease-in-out infinite;
+        }
+        .bg-effects::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -15%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -30px) scale(1.05); }
+            66% { transform: translate(-30px, 20px) scale(0.95); }
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 32px;
+            backdrop-filter: blur(10px);
+        }
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 550px;
+            margin: 0 auto 36px;
+            font-weight: 400;
+        }
+        .hero-tags {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+        .tag.flutter { background: rgba(2,86,155,0.15); border-color: rgba(2,86,155,0.3); color: #60a5fa; }
+        .tag.dart { background: rgba(1,117,194,0.15); border-color: rgba(1,117,194,0.3); color: #38bdf8; }
+        .tag.riverpod { background: rgba(31,174,228,0.15); border-color: rgba(31,174,228,0.3); color: #22d3ee; }
+        .tag.material { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.3); color: #34d399; }
+        .tag.offline { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); color: #c084fc; }
+
+        /* ===== SCREENSHOTS ===== */
+        .screenshots {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 80px;
+            flex-wrap: wrap;
+        }
+        .screenshots img {
+            width: 140px;
+            height: auto;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+        .screenshots img:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: var(--accent-1);
+        }
+
+        /* ===== SECTION ===== */
+        section {
+            margin-bottom: 64px;
+        }
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent-1);
+            margin-bottom: 12px;
+        }
+        .section-label::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: var(--accent-1);
+            border-radius: 1px;
+        }
+        section h2 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        section > p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 15px;
+        }
+
+        /* ===== FEATURE CARDS ===== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-4px);
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        .feature-icon.purple { background: rgba(99,102,241,0.15); }
+        .feature-icon.pink { background: rgba(236,72,153,0.15); }
+        .feature-icon.green { background: rgba(16,185,129,0.15); }
+        .feature-icon.amber { background: rgba(245,158,11,0.15); }
+        .feature-icon.cyan { background: rgba(6,182,212,0.15); }
+        .feature-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===== ARCHITECTURE ===== */
+        .arch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .arch-grid { grid-template-columns: 1fr; }
+        }
+        .arch-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .arch-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .arch-card h3 span {
+            font-size: 16px;
+        }
+
+        /* ===== FILE TREE ===== */
+        .file-tree {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            line-height: 1.9;
+            overflow-x: auto;
+        }
+        .file-tree .folder { color: var(--accent-1); }
+        .file-tree .file { color: var(--text-secondary); }
+        .file-tree .comment { color: var(--text-muted); }
+
+        /* ===== TABLE ===== */
+        .table-wrap {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+        }
+        td {
+            padding: 13px 20px;
+            font-size: 13.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        tr:last-child td { border-bottom: none; }
+        td code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background: rgba(99,102,241,0.1);
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: #a5b4fc;
+        }
+
+        /* ===== GRADE TABLE ===== */
+        .grade-table td:first-child {
+            font-weight: 700;
+            color: var(--accent-1);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ===== FLOW STEPS ===== */
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+        .flow-step:hover {
+            border-color: var(--border-hover);
+        }
+        .step-num {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .step-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .step-text strong {
+            color: var(--text-primary);
+        }
+
+        /* ===== PLATFORM GRID ===== */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 640px) {
+            .platform-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .platform-item {
+            text-align: center;
+            padding: 20px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .platform-item:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+        .platform-item .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .platform-item .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .platform-item .status {
+            font-size: 11px;
+            color: var(--green);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ===== CODE BLOCK ===== */
+        .code-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #34d399; }
+        .code-block .comment { color: var(--text-muted); }
+
+        /* ===== HIGHLIGHTS ===== */
+        .highlights {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .highlights { grid-template-columns: 1fr; }
+        }
+        .highlight-item {
+            text-align: center;
+            padding: 28px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+        .highlight-item .number {
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .highlight-item .label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ===== PRIVACY ===== */
+        .privacy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 640px) {
+            .privacy-grid { grid-template-columns: 1fr; }
+        }
+        .privacy-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .privacy-item .icon {
+            font-size: 20px;
+        }
+        .privacy-item .text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+        .footer-name {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .footer-email {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .footer-tagline {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        /* ===== ANIMATION ON SCROLL ===== */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-effects"></div>
+
+<div class="container">
+
+    <!-- ===== HERO ===== -->
+    <div class="hero fade-up">
+        <div class="hero-badge">
+            <div class="dot"></div>
+            Flutter • Mobile App • v1.0.3
+        </div>
+        <h1>MCKRU CGPA<br>Calculator</h1>
+        <p>A modern, offline-first Flutter application for university students to calculate GPA and CGPA with real-time stats and beautiful UI.</p>
+        <div class="hero-tags">
+            <span class="tag flutter">◆ Flutter 3.x</span>
+            <span class="tag dart">◆ Dart 3.8</span>
+            <span class="tag riverpod">◆ Riverpod</span>
+            <span class="tag material">◆ Material 3</span>
+            <span class="tag offline">◆ 100% Offline</span>
+        </div>
+    </div>
+
+    <!-- ===== SCREENSHOTS ===== -->
+    <div class="screenshots fade-up">
+        <img src="flutter_01.png" alt="Screenshot 1">
+        <img src="flutter_02.png" alt="Screenshot 2">
+        <img src="flutter_03.png" alt="Screenshot 3">
+        <img src="flutter_04.png" alt="Screenshot 4">
+        <img src="flutter_05.png" alt="Screenshot 5">
+    </div>
+
+    <!-- ===== KEY STATS ===== -->
+    <div class="highlights fade-up">
+        <div class="highlight-item">
+            <div class="number">2</div>
+            <div class="label">Calculation Modes</div>
+        </div>
+        <div class="highlight-item">
+            <div class="number">10</div>
+            <div class="label">Grade Scale Levels</div>
+        </div>
+        <div class="highlight-item">
+            <div class="number">0</div>
+            <div class="label">Network Calls</div>
+        </div>
+    </div>
+
+    <!-- ===== FEATURES ===== -->
+    <section class="fade-up">
+        <div class="section-label">Features</div>
+        <h2>What It Does</h2>
+        <p>Packed with everything a student needs to track their academic performance.</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon purple">📊</div>
+                <h3>Dual Calculation Modes</h3>
+                <p>GPA (Single) mode for per-semester course-level calculation, and CGPA (Multi) mode for cumulative multi-semester tracking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon pink">📝</div>
+                <h3>Marks Sheet</h3>
+                <p>Full data-entry table with Mid, Final, Sessional columns. Total and Grade auto-calculate as you type.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon green">🔄</div>
+                <h3>Bidirectional Sync</h3>
+                <p>Change marks → grade updates. Change grade → marks update. Always in sync, always accurate.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon amber">🎨</div>
+                <h3>Glassmorphism UI</h3>
+                <p>Frosted glass cards, mesh gradient background, neomorphic buttons — modern visual design.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon cyan">⚡</div>
+                <h3>Real-time Stats</h3>
+                <p>Bento grid dashboard with color-coded CGPA (green ≥ 3.5, amber ≥ 2.5, red &lt; 2.5) that updates instantly.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon purple">🔬</div>
+                <h3>Lab/Practical Toggle</h3>
+                <p>Special mode for practical courses — doubles marks for grade calculation, simulating a 50-mark scale.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ARCHITECTURE ===== -->
+    <section class="fade-up">
+        <div class="section-label">Architecture</div>
+        <h2>Tech Stack & Structure</h2>
+        <p>Clean layered architecture with Riverpod state management.</p>
+
+        <div class="file-tree" style="margin-bottom: 20px;">
+            <span class="folder">lib/</span><br>
+            ├── <span class="folder">models/</span><br>
+            │&nbsp;&nbsp; ├── <span class="file">course.dart</span> <span class="comment">// Course data model</span><br>
+            │&nbsp;&nbsp; ├── <span class="file">semester.dart</span> <span class="comment">// Semester with courses</span><br>
+            │&nbsp;&nbsp; └── <span class="file">semester_result.dart</span> <span class="comment">// GPA + credits</span><br>
+            ├── <span class="folder">providers/</span><br>
+            │&nbsp;&nbsp; └── <span class="file">semester_provider.dart</span> <span class="comment">// Riverpod state</span><br>
+            ├── <span class="folder">screens/</span><br>
+            │&nbsp;&nbsp; ├── <span class="file">home_screen.dart</span> <span class="comment">// Main calculator</span><br>
+            │&nbsp;&nbsp; └── <span class="file">marks_sheet_screen.dart</span> <span class="comment">// Marks entry</span><br>
+            ├── <span class="folder">services/</span><br>
+            │&nbsp;&nbsp; └── <span class="file">gpa_service.dart</span> <span class="comment">// Grade conversion</span><br>
+            ├── <span class="folder">theme/</span><br>
+            │&nbsp;&nbsp; └── <span class="file">app_theme.dart</span> <span class="comment">// Dark theme</span><br>
+            └── <span class="folder">widgets/</span><br>
+            &nbsp;&nbsp;&nbsp; ├── <span class="file">glass_card.dart</span> <span class="comment">// Glassmorphism</span><br>
+            &nbsp;&nbsp;&nbsp; ├── <span class="file">bento_card.dart</span> <span class="comment">// Stats card</span><br>
+            &nbsp;&nbsp;&nbsp; ├── <span class="file">course_row.dart</span> <span class="comment">// Course input</span><br>
+            &nbsp;&nbsp;&nbsp; ├── <span class="file">semester_row.dart</span> <span class="comment">// Semester input</span><br>
+            &nbsp;&nbsp;&nbsp; ├── <span class="file">neomorphic_button.dart</span> <span class="comment">// Styled button</span><br>
+            &nbsp;&nbsp;&nbsp; └── <span class="file">mesh_gradient_background.dart</span> <span class="comment">// Background</span>
+        </div>
+
+        <div class="arch-grid">
+            <div class="arch-card">
+                <h3><span>📦</span> State Management</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Provider</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>semesterProvider</code></td><td>Main GPA/CGPA state</td></tr>
+                            <tr><td><code>cgpaProvider</code></td><td>Multi-semester CGPA</td></tr>
+                            <tr><td><code>marksSheetProvider</code></td><td>Marks sheet state</td></tr>
+                            <tr><td><code>gpaStatsProvider</code></td><td>Derived real-time stats</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="arch-card">
+                <h3><span>🧩</span> Dependencies</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Package</th><th>Used For</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>flutter_riverpod</code></td><td>State management</td></tr>
+                            <tr><td><code>google_fonts</code></td><td>Lexend & Inter fonts</td></tr>
+                            <tr><td><code>flutter_animate</code></td><td>Animations</td></tr>
+                            <tr><td><code>shared_preferences</code></td><td>Local persistence</td></tr>
+                            <tr><td><code>uuid</code></td><td>Unique ID generation</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== GRADE SCALE ===== -->
+    <section class="fade-up">
+        <div class="section-label">Grading</div>
+        <h2>Smart Grade Conversion</h2>
+        <p>10-grade scale with automatic marks-to-grade conversion and lab/practical support.</p>
+
+        <div class="table-wrap">
+            <table class="grade-table">
+                <thead>
+                    <tr><th>Grade</th><th>Points</th><th>Min Marks</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>A</td><td>4.0</td><td>85</td><td>Excellent</td></tr>
+                    <tr><td>A-</td><td>3.7</td><td>80</td><td>Excellent</td></tr>
+                    <tr><td>B+</td><td>3.3</td><td>75</td><td>Very Good</td></tr>
+                    <tr><td>B</td><td>3.0</td><td>70</td><td>Good</td></tr>
+                    <tr><td>B-</td><td>2.7</td><td>65</td><td>Above Average</td></tr>
+                    <tr><td>C+</td><td>2.3</td><td>61</td><td>Average</td></tr>
+                    <tr><td>C</td><td>2.0</td><td>58</td><td>Below Average</td></tr>
+                    <tr><td>C-</td><td>1.7</td><td>55</td><td>Needs Improvement</td></tr>
+                    <tr><td>D</td><td>1.0</td><td>50</td><td>Pass</td></tr>
+                    <tr><td>F</td><td>0.0</td><td>&lt; 50</td><td>Fail</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="fade-up">
+        <div class="section-label">Workflow</div>
+        <h2>How It Works</h2>
+        <p>Simple, intuitive flow for both GPA and CGPA calculation modes.</p>
+
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--text-secondary);">GPA Mode</h3>
+        <div class="flow-steps" style="margin-bottom: 32px;">
+            <div class="flow-step">
+                <div class="step-num">1</div>
+                <div class="step-text">Select <strong>"GPA (Single)"</strong> mode from the toggle</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">2</div>
+                <div class="step-text">Add courses with name, <strong>credit hours (1-6)</strong>, and <strong>total marks (0-100)</strong></div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">3</div>
+                <div class="step-text">Marks auto-convert to <strong>letter grades</strong> using the 10-grade scale</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">4</div>
+                <div class="step-text">Semester GPA = <code>Σ(grade_points × credits) / Σ(credits)</code></div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">5</div>
+                <div class="step-text">Overall <strong>CGPA computed across all semesters</strong> in real-time</div>
+            </div>
+        </div>
+
+        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--text-secondary);">CGPA Mode</h3>
+        <div class="flow-steps">
+            <div class="flow-step">
+                <div class="step-num">1</div>
+                <div class="step-text">Select <strong>"CGPA (Multi)"</strong> mode from the toggle</div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">2</div>
+                <div class="step-text">Add semesters with name, credit hours, and <strong>GPA (0.0-4.0)</strong></div>
+            </div>
+            <div class="flow-step">
+                <div class="step-num">3</div>
+                <div class="step-text">CGPA = <strong>simple average of all semester GPAs</strong></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PLATFORMS ===== -->
+    <section class="fade-up">
+        <div class="section-label">Platforms</div>
+        <h2>Cross-Platform Support</h2>
+        <p>Built with Flutter — runs on Android, Windows, Web, and iOS.</p>
+
+        <div class="platform-grid">
+            <div class="platform-item">
+                <div class="icon">🤖</div>
+                <div class="name">Android</div>
+                <div class="status">Signed Release</div>
+            </div>
+            <div class="platform-item">
+                <div class="icon">🪟</div>
+                <div class="name">Windows</div>
+                <div class="status">MSIX Package</div>
+            </div>
+            <div class="platform-item">
+                <div class="icon">🌐</div>
+                <div class="name">Web</div>
+                <div class="status">Supported</div>
+            </div>
+            <div class="platform-item">
+                <div class="icon">🍎</div>
+                <div class="name">iOS</div>
+                <div class="status">Configured</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRIVACY ===== -->
+    <section class="fade-up">
+        <div class="section-label">Privacy</div>
+        <h2>Privacy-First Design</h2>
+
+        <div class="privacy-grid">
+            <div class="privacy-item">
+                <div class="icon">📴</div>
+                <div class="text">100% Offline</div>
+            </div>
+            <div class="privacy-item">
+                <div class="icon">🚫</div>
+                <div class="text">No Data Collection</div>
+            </div>
+            <div class="privacy-item">
+                <div class="icon">💾</div>
+                <div class="text">Local Storage Only</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== GETTING STARTED ===== -->
+    <section class="fade-up">
+        <div class="section-label">Setup</div>
+        <h2>Getting Started</h2>
+
+        <div class="code-block">
+            <span class="comment"># Clone the repository</span><br>
+            <span class="keyword">git clone</span> <span class="string">https://github.com/your-username/cgpa_calculator.git</span><br><br>
+            <span class="comment"># Navigate to project directory</span><br>
+            <span class="keyword">cd</span> cgpa_calculator<br><br>
+            <span class="comment"># Install dependencies</span><br>
+            <span class="keyword">flutter pub get</span><br><br>
+            <span class="comment"># Run the app</span><br>
+            <span class="keyword">flutter run</span>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer fade-up">
+        <div class="footer-name">Jibran Khan Dehpal</div>
+        <div class="footer-email">jibrankhandehpal@gmail.com</div>
+        <div class="footer-tagline">Built with Flutter, Riverpod, and a passion for clean UI/UX design.</div>
+    </div>
+
+</div>
+
+<!-- ===== SCROLL ANIMATION ===== -->
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MCKRU CGPA Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f0ff;--surface:#ffffff;--surface-2:#f9f7ff;
+  --fg:#2d1b69;--muted:#8b7fad;--border:rgba(45,27,105,.06);
+  --orange:#ff8c42;--purple:#a855f7;--blue:#3b82f6;--green:#22c55e;--pink:#ec4899;--yellow:#f59e0b;--red:#ef4444;--cyan:#06b6d4;
+  --radius:28px;--radius-md:20px;--radius-sm:16px;
+  --font:'Nunito',system-ui,sans-serif;
+  --shadow:0 4px 20px rgba(45,27,105,.06);
+  --shadow-lg:0 8px 32px rgba(45,27,105,.1);
+  --nav-bg:rgba(255,255,255,.92);--nav-shadow:0 -4px 24px rgba(45,27,105,.08);
+}
+.dark{
+  --bg:#12101e;--surface:#1e1a30;--surface-2:#261f3a;
+  --fg:#e8e0ff;--muted:#7b6fa0;--border:rgba(255,255,255,.06);
+  --nav-bg:rgba(30,26,48,.95);--nav-shadow:0 -4px 24px rgba(0,0,0,.3);
+}
+html,body{font-family:var(--font);background:var(--bg);color:var(--fg);line-height:1.5;-webkit-font-smoothing:antialiased;height:100%;overflow:hidden;transition:background .4s,color .4s}
+
+/* ═══ SPLASH ═══ */
+.splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#ff8c42 0%,#f7c948 30%,#ec4899 60%,#a855f7 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s,transform .6s}
+.splash.hide{opacity:0;transform:scale(1.08);pointer-events:none}
+.splash-blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.4;animation:blobMove 4s ease-in-out infinite}
+.splash-blob:nth-child(1){width:200px;height:200px;background:#f7c948;top:10%;left:10%;animation-delay:0s}
+.splash-blob:nth-child(2){width:160px;height:160px;background:#ec4899;bottom:20%;right:15%;animation-delay:1s}
+.splash-blob:nth-child(3){width:120px;height:120px;background:#3b82f6;top:50%;left:60%;animation-delay:2s}
+@keyframes blobMove{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-20px) scale(1.1)}}
+.splash-content{position:relative;z-index:1;text-align:center}
+.splash-icon{width:90px;height:90px;background:#fff;border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 12px 40px rgba(0,0,0,.2);margin:0 auto 16px;animation:bounceIn .8s cubic-bezier(.68,-.55,.265,1.55)}
+.splash-title{color:#fff;font-size:28px;font-weight:900;letter-spacing:-0.02em;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.splash-sub{color:rgba(255,255,255,.85);font-size:14px;margin-top:6px;font-weight:600}
+@keyframes bounceIn{0%{transform:scale(0) rotate(-10deg)}60%{transform:scale(1.1) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+
+/* ═══ ONBOARDING ═══ */
+.onboarding{position:fixed;inset:0;z-index:9998;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.onboarding.show{display:flex}
+.onboard-visual{width:180px;height:180px;border-radius:50%;margin-bottom:28px;display:flex;align-items:center;justify-content:center;position:relative;animation:float 3s ease-in-out infinite}
+.onboard-visual::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:3px dashed var(--purple);opacity:.3;animation:spin 20s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.onboard-emoji{font-size:80px}
+.onboard-title{font-size:26px;font-weight:900;margin-bottom:10px;letter-spacing:-0.02em}
+.onboard-desc{font-size:14px;color:var(--muted);max-width:300px;margin-bottom:36px;line-height:1.7}
+.onboard-dots{display:flex;gap:10px;margin-bottom:32px}
+.onboard-dot{width:10px;height:10px;border-radius:5px;background:var(--border);transition:all .4s cubic-bezier(.4,0,.2,1)}
+.onboard-dot.active{width:32px;background:linear-gradient(135deg,var(--orange),var(--pink))}
+.onboard-btn{padding:16px 56px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;font:800 16px/1 var(--font);cursor:pointer;box-shadow:0 8px 28px rgba(255,140,66,.35);transition:transform .2s,box-shadow .2s}
+.onboard-btn:active{transform:scale(.96);box-shadow:0 4px 16px rgba(255,140,66,.3)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+/* ═══ APP SHELL ═══ */
+.shell{position:fixed;inset:0;display:none;flex-direction:column}
+.shell.show{display:flex}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-avatar{width:48px;height:48px;border-radius:18px;background:linear-gradient(145deg,#fbbf24,#f472b6);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 16px rgba(251,191,36,.3);transition:transform .3s}
+.topbar-avatar:hover{transform:scale(1.1) rotate(-5deg)}
+.topbar-greeting{font-size:12px;color:var(--muted);font-weight:600}
+.topbar-name{font-size:18px;font-weight:900;letter-spacing:-0.01em}
+.topbar-right{display:flex;align-items:center;gap:8px}
+
+/* Toggle */
+.toggle{width:56px;height:30px;border-radius:15px;background:linear-gradient(135deg,#ffecd2,#fcb69f);border:none;position:relative;cursor:pointer;transition:all .4s;box-shadow:inset 0 2px 4px rgba(0,0,0,.08)}
+.toggle.dark{background:linear-gradient(135deg,#2d1b69,#1a1040);box-shadow:inset 0 2px 4px rgba(0,0,0,.3)}
+.toggle-knob{width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .4s cubic-bezier(.68,-.55,.265,1.55);box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:13px}
+.toggle.dark .toggle-knob{transform:translateX(26px)}
+
+/* Pages */
+.pages{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 18px 95px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.page{display:none;animation:fadeUp .35s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* Bottom nav */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:var(--nav-bg);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 -4px 24px rgba(0,0,0,.06);z-index:100;border-radius:24px 24px 0 0}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 16px;border:none;background:none;cursor:pointer;color:var(--muted);font:800 10px/1 var(--font);transition:all .25s cubic-bezier(.4,0,.2,1);-webkit-tap-highlight-color:transparent;border-radius:16px;position:relative}
+.nav-item.active{color:var(--orange);background:rgba(255,140,66,.1);transform:translateY(-2px)}
+.nav-item svg{width:24px;height:24px;transition:transform .25s cubic-bezier(.4,0,.2,1)}
+.nav-item.active svg{transform:scale(1.15) translateY(-2px)}
+
+/* ═══ HOME — PLAYFUL ═══ */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes wiggle{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes sparkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+@keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(10px,-15px) scale(1.05)}66%{transform:translate(-8px,8px) scale(.95)}}
+
+.home-hero{background:linear-gradient(145deg,#a78bfa 0%,#c084fc 30%,#f472b6 70%,#fb923c 100%);border-radius:32px;padding:28px 24px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(168,85,247,.3)}
+.home-hero-blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.35;animation:blobFloat 6s ease-in-out infinite}
+.home-hero-blob:nth-child(1){width:140px;height:140px;background:#fbbf24;top:-30px;right:-20px;animation-delay:0s}
+.home-hero-blob:nth-child(2){width:100px;height:100px;background:#34d399;bottom:-20px;left:10%;animation-delay:2s}
+.home-hero-blob:nth-child(3){width:80px;height:80px;background:#60a5fa;top:40%;right:30%;animation-delay:4s}
+
+.home-hero-stars{position:absolute;top:16px;right:80px;font-size:20px;animation:sparkle 2s ease-in-out infinite}
+.home-hero-stars2{position:absolute;top:50px;right:20px;font-size:14px;animation:sparkle 2.5s ease-in-out infinite .5s}
+
+.home-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.25);backdrop-filter:blur(8px);padding:6px 14px;border-radius:24px;font-size:12px;font-weight:800;margin-bottom:14px;border:1.5px solid rgba(255,255,255,.2)}
+.home-hero-greeting{font-size:15px;font-weight:700;opacity:.9;margin-bottom:2px}
+.home-hero-title{font-size:14px;font-weight:800;opacity:.75;margin-bottom:14px;text-transform:uppercase;letter-spacing:.06em}
+.home-hero-val{font-size:52px;font-weight:900;letter-spacing:-0.04em;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.15)}
+.home-hero-sub{font-size:13px;opacity:.85;margin-top:8px;font-weight:600}
+
+.home-quick-section{margin-bottom:24px}
+.home-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.home-section-title{font-size:18px;font-weight:900;display:flex;align-items:center;gap:8px}
+
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick-card{border-radius:24px;padding:22px 18px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;border:none;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.quick-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.quick-card:active{transform:scale(.96)}
+.quick-card-icon{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;transition:transform .3s;color:var(--fg)}
+.quick-card:hover .quick-card-icon{transform:scale(1.08) rotate(-3deg)}
+.quick-card-title{font-size:15px;font-weight:900;display:block;margin-bottom:4px}
+.quick-card-desc{font-size:11px;opacity:.65;font-weight:700}
+.qc-orange{background:linear-gradient(145deg,#fff7ed,#fed7aa);color:#9a3412}
+.qc-purple{background:linear-gradient(145deg,#faf5ff,#e9d5ff);color:#6b21a8}
+.qc-blue{background:linear-gradient(145deg,#eff6ff,#bfdbfe);color:#1e40af}
+.qc-green{background:linear-gradient(145deg,#ecfdf5,#a7f3d0);color:#166534}
+
+.home-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.home-stat{background:var(--surface);border-radius:24px;padding:20px 14px 16px;box-shadow:0 4px 16px rgba(0,0,0,.05);text-align:center;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;cursor:default}
+.home-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:24px 24px 0 0;opacity:0;transition:opacity .3s}
+.home-stat:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.1)}
+.home-stat:hover::before{opacity:1}
+.home-stat:active{transform:scale(.97)}
+.home-stat-ring{width:72px;height:72px;margin:0 auto 10px;position:relative;display:flex;align-items:center;justify-content:center}
+.home-stat-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.home-stat-ring circle{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+.home-stat-ring .ring-bg{opacity:.15}
+.home-stat-ring .ring-fill{transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.home-stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.home-stat:hover .home-stat-icon{transform:scale(1.1) rotate(-3deg)}
+.home-stat-level{position:absolute;top:-2px;right:-2px;background:var(--surface);border:2px solid var(--border);border-radius:8px;padding:1px 5px;font-size:8px;font-weight:900;color:var(--muted);letter-spacing:.04em;line-height:1.4}
+.home-stat-label{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.home-stat-val{font-size:28px;font-weight:900;margin-top:2px;letter-spacing:-0.03em;line-height:1}
+.home-stat-xp{display:flex;align-items:center;justify-content:center;gap:4px;margin-top:8px}
+.home-stat-xp-bar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;max-width:80px}
+.home-stat-xp-fill{height:100%;border-radius:2px;transition:width 1s cubic-bezier(.4,0,.2,1);width:0%}
+.home-stat-xp-text{font-size:8px;font-weight:800;color:var(--muted);white-space:nowrap;letter-spacing:.03em}
+@keyframes statPulse{0%{box-shadow:0 0 0 0 var(--stat-glow)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.home-stat.pulse{animation:statPulse .6s ease-out}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.home-stat-val.animate{animation:countUp .4s cubic-bezier(.4,0,.2,1)}
+
+.home-motivation{display:flex;align-items:center;gap:10px;background:linear-gradient(145deg,#fef3c7,#fde68a);border-radius:20px;padding:14px 18px;margin-bottom:20px;box-shadow:0 4px 12px rgba(251,191,36,.15)}
+.home-motivation-icon{width:40px;height:40px;border-radius:12px;background:rgba(146,64,14,.1);display:flex;align-items:center;justify-content:center;color:#92400e;flex-shrink:0}
+.home-motivation-text{font-size:13px;font-weight:800;color:#92400e;flex:1}
+
+/* ═══ GPA PAGE ═══ */
+.gpa-page-header{background:linear-gradient(135deg,var(--orange),var(--yellow));border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.gpa-page-header::after{content:'📝';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.25}
+.gpa-page-header h2{font-size:20px;font-weight:900}
+.gpa-page-header p{font-size:12px;opacity:.8;font-weight:600}
+.gpa-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.gpa-add{padding:10px 18px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;font:800 13px/1 var(--font);cursor:pointer;box-shadow:0 4px 16px rgba(255,140,66,.3);display:flex;align-items:center;gap:6px;transition:transform .15s}
+.gpa-add:active{transform:scale(.95)}
+.gpa-add svg{width:15px;height:15px}
+.gpa-card{background:var(--surface);border-radius:var(--radius-md);padding:20px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--orange);transition:transform .2s}
+.gpa-card:active{transform:scale(.99)}
+.gpa-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.gpa-card-num{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.gpa-card-name{font-size:15px;font-weight:800;border:none;background:none;color:var(--fg);font-family:var(--font);flex:1;margin:0 10px;padding:0}
+.gpa-card-name:focus{outline:none}
+.gpa-card-del{width:30px;height:30px;border:none;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+.gpa-card-del:hover{background:#fde8e8;color:var(--red)}
+.gpa-card-del:disabled{opacity:.15;cursor:default}
+.gpa-field{margin-bottom:14px}
+.gpa-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.gpa-field input{width:100%;padding:14px 16px;background:var(--surface-2);border:2.5px solid transparent;border-radius:var(--radius-sm);color:var(--fg);font:800 16px/1 var(--font);transition:all .25s}
+.gpa-field input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 4px rgba(255,140,66,.12)}
+.gpa-field input::placeholder{color:var(--muted);font-weight:600}
+.gpa-grade-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius-sm)}
+.gpa-grade-label{font-size:12px;color:var(--muted);font-weight:700}
+.gpa-grade-badge{font-size:15px;font-weight:900;padding:5px 16px;border-radius:20px;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.gpa-credits-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface-2);border-radius:var(--radius-sm);margin-bottom:14px}
+.gpa-credits-label{font-size:12px;color:var(--muted);font-weight:700}
+.gpa-credits-pills{display:flex;gap:6px}
+.gpa-credit-pill{width:34px;height:34px;border-radius:10px;border:2.5px solid transparent;background:var(--surface);color:var(--muted);font:800 14px/1 var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s cubic-bezier(.4,0,.2,1)}
+.gpa-credit-pill:hover{border-color:var(--orange);color:var(--orange)}
+.gpa-credit-pill.active{background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(255,140,66,.3)}
+.gpa-lab-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.gpa-lab-pill{padding:7px 16px;border-radius:20px;border:2.5px solid transparent;background:var(--surface);color:var(--muted);font:700 12px/1 var(--font);transition:all .25s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:5px}
+.gpa-lab-pill.active{background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(6,182,212,.3)}
+.gpa-lab-pill:active{transform:scale(.95)}
+.gpa-lab-check{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.gpa-lab-pill.active .gpa-lab-check{border-color:#fff;background:rgba(255,255,255,.3)}
+.gpa-lab-check::after{content:'';width:8px;height:8px;border-radius:50%;background:transparent;transition:all .2s}
+.gpa-lab-pill.active .gpa-lab-check::after{background:#fff}
+.gpa-result{background:linear-gradient(135deg,var(--orange),var(--pink),var(--purple));border-radius:var(--radius);padding:24px;box-shadow:0 12px 32px rgba(168,85,247,.2);text-align:center;margin-top:18px;color:#fff}
+.gpa-result-label{font-size:13px;opacity:.85;font-weight:700}
+.gpa-result-val{font-size:48px;font-weight:900;letter-spacing:-0.03em;line-height:1.1}
+.gpa-result-grade{font-size:14px;font-weight:800;margin-top:6px;opacity:.9}
+
+/* ═══ CGPA PAGE ═══ */
+.cgpa-page-header{background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.cgpa-page-header::after{content:'🎓';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.25}
+.cgpa-page-header h2{font-size:20px;font-weight:900}
+.cgpa-page-header p{font-size:12px;opacity:.8;font-weight:600}
+.cgpa-add{padding:10px 18px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font:800 13px/1 var(--font);cursor:pointer;box-shadow:0 4px 16px rgba(168,85,247,.3);display:flex;align-items:center;gap:6px;transition:transform .15s}
+.cgpa-add:active{transform:scale(.95)}
+.cgpa-add svg{width:15px;height:15px}
+.cgpa-card{background:var(--surface);border-radius:var(--radius-md);padding:20px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--purple);transition:transform .2s}
+.cgpa-card:active{transform:scale(.99)}
+.cgpa-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cgpa-card-num{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+.cgpa-card-name{font-size:15px;font-weight:800;border:none;background:none;color:var(--fg);font-family:var(--font);flex:1;margin:0 10px;padding:0}
+.cgpa-card-name:focus{outline:none}
+.cgpa-card-del{width:30px;height:30px;border:none;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s}
+.cgpa-card-del:disabled{opacity:.15;cursor:default}
+.cgpa-field{margin-bottom:14px}
+.cgpa-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.cgpa-field input{width:100%;padding:14px 16px;background:var(--surface-2);border:2.5px solid transparent;border-radius:var(--radius-sm);color:var(--fg);font:800 16px/1 var(--font);transition:all .25s}
+.cgpa-field input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px rgba(168,85,247,.12)}
+.cgpa-field input::placeholder{color:var(--muted);font-weight:600}
+.cgpa-field .field-hint{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600}
+.cgpa-result{background:linear-gradient(135deg,var(--purple),var(--pink),var(--orange));border-radius:var(--radius);padding:28px;box-shadow:0 12px 32px rgba(168,85,247,.25);text-align:center;margin-top:18px;color:#fff}
+.cgpa-result-label{font-size:13px;opacity:.85;font-weight:700}
+.cgpa-result-val{font-size:52px;font-weight:900;letter-spacing:-0.03em;line-height:1.1}
+
+/* ═══ STORAGE PAGE ═══ */
+.storage-page-header{background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.storage-page-header::after{content:'💾';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.25}
+.storage-page-header h2{font-size:20px;font-weight:900}
+.storage-page-header p{font-size:12px;opacity:.8;font-weight:600}
+.storage-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.storage-clear{padding:10px 18px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--red),#ff6b6b);color:#fff;font:800 13px/1 var(--font);cursor:pointer;box-shadow:0 4px 16px rgba(239,68,68,.3);transition:transform .15s}
+.storage-clear:active{transform:scale(.95)}
+.storage-empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.storage-empty-icon{font-size:56px;margin-bottom:14px}
+.storage-empty p{font-size:14px;font-weight:600;line-height:1.6}
+.storage-section{margin-bottom:18px}
+.storage-section-title{font-size:14px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.storage-item{background:var(--surface);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;transition:transform .15s}
+.storage-item:active{transform:scale(.98)}
+.storage-item-left{display:flex;align-items:center;gap:12px}
+.storage-item-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0}
+.storage-item-name{font-size:14px;font-weight:700}
+.storage-item-meta{font-size:11px;color:var(--muted);font-weight:600}
+.storage-item-val{font-size:16px;font-weight:900}
+
+/* ═══ SETTINGS PAGE ═══ */
+.settings-page-header{background:linear-gradient(135deg,var(--green),var(--cyan));border-radius:var(--radius);padding:20px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.settings-page-header::after{content:'⚙️';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;opacity:.25}
+.settings-page-header h2{font-size:20px;font-weight:900}
+.settings-page-header p{font-size:12px;opacity:.8;font-weight:600}
+.settings-group{background:var(--surface);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px}
+.settings-item{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);transition:background .15s}
+.settings-item:last-child{border-bottom:none}
+.settings-item:active{background:var(--surface-2)}
+.settings-item-left{display:flex;align-items:center;gap:14px}
+.settings-item-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.settings-item-label{font-size:14px;font-weight:700}
+.settings-item-desc{font-size:11px;color:var(--muted);font-weight:600}
+.settings-item-right{color:var(--muted)}
+.settings-item-right svg{width:18px;height:18px}
+.grades-ref{background:var(--surface);border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow)}
+.grades-ref h3{font-size:15px;font-weight:900;margin-bottom:14px}
+.grade-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.grade-row:last-child{border-bottom:none}
+.grade-row-marks{font-size:13px;font-weight:700;min-width:50px}
+.grade-row-letter{font-size:13px;font-weight:900;padding:4px 14px;border-radius:14px;color:#fff}
+.grade-row-points{font-size:13px;color:var(--muted);font-weight:700}
+
+/* ═══ ONBOARD — NAME + AVATAR ═══ */
+.onboard-name-field{width:100%;max-width:280px;margin-bottom:24px}
+.onboard-name-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em;text-align:left}
+.onboard-name-input{width:100%;padding:14px 18px;background:var(--surface);border:2.5px solid var(--border);border-radius:var(--radius-sm);color:var(--fg);font:800 16px/1 var(--font);text-align:center;transition:all .25s}
+.onboard-name-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px rgba(168,85,247,.15)}
+.onboard-name-input::placeholder{color:var(--muted);font-weight:600}
+.onboard-avatar-label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.onboard-avatar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:280px;margin-bottom:28px}
+.onboard-avatar-option{width:100%;aspect-ratio:1;border-radius:18px;border:3px solid transparent;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.onboard-avatar-option:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.onboard-avatar-option.selected{border-color:var(--purple);background:linear-gradient(135deg,#f3e8ff,#e9d5ff);transform:scale(1.08);box-shadow:0 4px 20px rgba(168,85,247,.25)}
+.onboard-avatar-option:active{transform:scale(.95)}
+
+@media(max-width:380px){.app{padding:12px 10px 80px}.home-hero-val{font-size:36px}.gpa-result-val{font-size:40px}.cgpa-result-val{font-size:44px}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div class="splash" id="splash">
+  <div class="splash-blob"></div><div class="splash-blob"></div><div class="splash-blob"></div>
+  <div class="splash-content">
+    <div class="splash-icon"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+    <div class="splash-title">Work Go Continue</div>
+    <div class="splash-sub">Your academic calculator</div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="onboarding" id="onboarding">
+  <div class="onboard-visual" id="onboardVisual" style="background:linear-gradient(135deg,#fff4e6,#ffe0c2)">
+    <div class="onboard-emoji" id="onboardEmoji">📚</div>
+  </div>
+  <div class="onboard-title" id="onboardTitle">Track Your Grades</div>
+  <div class="onboard-desc" id="onboardDesc">Enter your marks for each subject and let us calculate your GPA automatically.</div>
+  <div class="onboard-dots"><div class="onboard-dot active" id="dot0"></div><div class="onboard-dot" id="dot1"></div><div class="onboard-dot" id="dot2"></div><div class="onboard-dot" id="dot3"></div></div>
+  <button class="onboard-btn" id="onboardBtn" onclick="nextOnboard()">Next</button>
+</div>
+
+<!-- ONBOARD — NAME + AVATAR -->
+<div class="onboarding" id="onboardingName">
+  <div class="onboard-visual" style="background:linear-gradient(135deg,#e6faf0,#c8f5dc)">
+    <div class="onboard-emoji">👋</div>
+  </div>
+  <div class="onboard-title">What's Your Name?</div>
+  <div class="onboard-desc">Tell us who you are so we can personalize your experience.</div>
+  <div class="onboard-name-field">
+    <label>Your Name</label>
+    <input class="onboard-name-input" id="onboardNameInput" type="text" placeholder="Enter your name..." maxlength="20" autocomplete="off">
+  </div>
+  <div class="onboard-avatar-label">Pick an Avatar</div>
+  <div class="onboard-avatar-grid" id="avatarGrid"></div>
+  <div class="onboard-dots"><div class="onboard-dot" id="dot0b"></div><div class="onboard-dot" id="dot1b"></div><div class="onboard-dot" id="dot2b"></div><div class="onboard-dot active" id="dot3b"></div></div>
+  <button class="onboard-btn" onclick="finishOnboardName()">Let's Go 🚀</button>
+</div>
+
+<!-- APP SHELL -->
+<div class="shell" id="shell">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-avatar" id="topbarAvatar">🐱</div>
+      <div><div class="topbar-greeting">Welcome back!</div><div class="topbar-name" id="topbarName">Work Go Continue</div></div>
+    </div>
+    <div class="topbar-right">
+      <div class="toggle" id="darkToggle" onclick="toggleDark()"><div class="toggle-knob" id="toggleKnob">☀️</div></div>
+    </div>
+  </div>
+
+  <div class="pages">
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <div class="home-hero-blob"></div>
+        <div class="home-hero-blob"></div>
+        <div class="home-hero-blob"></div>
+        <div class="home-hero-stars">✨</div>
+        <div class="home-hero-stars2">⭐</div>
+        <div class="home-hero-badge">📊 Your CGPA</div>
+        <div class="home-hero-greeting" id="homeGreeting">Hey there! 👋</div>
+        <div class="home-hero-title">Your Grades</div>
+        <div class="home-hero-val" id="homeCGPA">—</div>
+        <div class="home-hero-sub" id="homeSub">Start adding your grades</div>
+      </div>
+
+      <div class="home-stats">
+        <div class="home-stat">
+          <div class="home-stat-icon" style="background:linear-gradient(145deg,#fef3c7,#fde68a)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div class="home-stat-label">Avg GPA</div>
+          <div class="home-stat-val" id="homeAvgGPA">—</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-icon" style="background:linear-gradient(145deg,#f3e8ff,#e9d5ff)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div class="home-stat-label">Semesters</div>
+          <div class="home-stat-val" id="homeSems">0</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-icon" style="background:linear-gradient(145deg,#dbeafe,#bfdbfe)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="home-stat-label">Subjects</div>
+          <div class="home-stat-val" id="homeSubs">0</div>
+        </div>
+        <div class="home-stat">
+          <div class="home-stat-icon" style="background:linear-gradient(145deg,#d1fae5,#a7f3d0)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="home-stat-label">Credits</div>
+          <div class="home-stat-val" id="homeCredits">0</div>
+        </div>
+      </div>
+
+      <div class="home-motivation" id="homeMotivation">
+        <div class="home-motivation-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <span class="home-motivation-text" id="homeMotivationText">You got this! Start calculating your grades</span>
+      </div>
+
+      <div class="home-quick-section">
+        <div class="home-section-header">
+          <div class="home-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Quick Actions
+          </div>
+        </div>
+        <div class="quick-actions">
+          <div class="quick-card qc-orange" onclick="switchPage('gpa')">
+            <span class="quick-card-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg></span>
+            <span class="quick-card-title">GPA Calculator</span>
+            <span class="quick-card-desc">Enter marks, get GPA</span>
+          </div>
+          <div class="quick-card qc-purple" onclick="switchPage('cgpa')">
+            <span class="quick-card-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+            <span class="quick-card-title">CGPA Calculator</span>
+            <span class="quick-card-desc">Track semesters</span>
+          </div>
+          <div class="quick-card qc-blue" onclick="switchPage('storage')">
+            <span class="quick-card-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span>
+            <span class="quick-card-title">Saved Data</span>
+            <span class="quick-card-desc">View records</span>
+          </div>
+          <div class="quick-card qc-green" onclick="switchPage('settings')">
+            <span class="quick-card-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            <span class="quick-card-title">Settings</span>
+            <span class="quick-card-desc">Customize</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GPA PAGE -->
+    <div class="page" id="page-gpa">
+      <div class="gpa-page-header"><h2>GPA Calculator</h2><p>Enter marks out of 100 for each subject</p></div>
+      <div class="gpa-top-row"><div></div><button class="gpa-add" onclick="addGPACard()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>Add Subject</button></div>
+      <div id="gpaCards"></div>
+      <div class="gpa-result" id="gpaResult" style="display:none"><div class="gpa-result-label">✨ Semester GPA</div><div class="gpa-result-val" id="gpaResultVal">0.00</div><div class="gpa-result-grade" id="gpaResultGrade"></div></div>
+    </div>
+
+    <!-- CGPA PAGE -->
+    <div class="page" id="page-cgpa">
+      <div class="cgpa-page-header"><h2>CGPA Calculator</h2><p>Add semesters with GPA (max 4.00)</p></div>
+      <div class="gpa-top-row"><div></div><button class="cgpa-add" onclick="addSemester()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>Add Semester</button></div>
+      <div id="cgpaCards"></div>
+      <div class="cgpa-result" id="cgpaResult" style="display:none"><div class="cgpa-result-label">🏆 Cumulative CGPA</div><div class="cgpa-result-val" id="cgpaResultVal">0.00</div></div>
+    </div>
+
+    <!-- STORAGE PAGE -->
+    <div class="page" id="page-storage">
+      <div class="storage-page-header"><h2>Saved Data</h2><p>All your academic records</p></div>
+      <div class="storage-top-row"><div></div><button class="storage-clear" onclick="clearAll()">🗑️ Clear All</button></div>
+      <div id="storageContent"></div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="settings-page-header"><h2>Settings</h2><p>Customize your experience</p></div>
+      <div class="settings-group">
+        <div class="settings-item">
+          <div class="settings-item-left"><div class="settings-item-icon" style="background:linear-gradient(135deg,#fff4e6,#ffe0c2)">🌙</div><div><div class="settings-item-label">Dark Mode</div><div class="settings-item-desc">Toggle light/dark theme</div></div></div>
+          <div class="toggle" id="darkToggle2" onclick="toggleDark()"><div class="toggle-knob" id="toggleKnob2">☀️</div></div>
+        </div>
+        <div class="settings-item" onclick="resetApp()">
+          <div class="settings-item-left"><div class="settings-item-icon" style="background:linear-gradient(135deg,#fde8e8,#fbb4b4)">🗑️</div><div><div class="settings-item-label">Reset All Data</div><div class="settings-item-desc">Clear everything permanently</div></div></div>
+          <div class="settings-item-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-item-left"><div class="settings-item-icon" style="background:linear-gradient(135deg,#e8f2ff,#d0e4ff)">ℹ️</div><div><div class="settings-item-label">About</div><div class="settings-item-desc">MCKRU CGPA Calculator v2.0</div></div></div>
+          <div class="settings-item-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+      <div class="grades-ref"><h3>📋 Grade Reference (Marks → GPA)</h3><div id="gradeRef"></div></div>
+    </div>
+  </div>
+
+  <div class="bottomnav">
+    <button class="nav-item active" data-page="home" onclick="switchPage('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Home</span></button>
+    <button class="nav-item" data-page="gpa" onclick="switchPage('gpa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span>GPA</span></button>
+    <button class="nav-item" data-page="cgpa" onclick="switchPage('cgpa')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><span>CGPA</span></button>
+    <button class="nav-item" data-page="storage" onclick="switchPage('storage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Storage</span></button>
+    <button class="nav-item" data-page="settings" onclick="switchPage('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></button>
+  </div>
+</div>
+
+<script>
+const GRADE_MAP=[{min:85,letter:'A',gpa:4.0,color:'#22c55e'},{min:80,letter:'A-',gpa:3.7,color:'#34c759'},{min:75,letter:'B+',gpa:3.3,color:'#3b82f6'},{min:70,letter:'B',gpa:3.0,color:'#06b6d4'},{min:65,letter:'B-',gpa:2.7,color:'#8b5cf6'},{min:61,letter:'C+',gpa:2.3,color:'#a855f7'},{min:58,letter:'C',gpa:2.0,color:'#f59e0b'},{min:55,letter:'C-',gpa:1.7,color:'#f97316'},{min:50,letter:'D',gpa:1.0,color:'#ef4444'},{min:0,letter:'F',gpa:0.0,color:'#6b7280'}];
+const COLORS=['#ff8c42','#a855f7','#3b82f6','#22c55e','#ec4899','#06b6d4','#f59e0b','#ef4444'];
+const BG_GRAD=['linear-gradient(135deg,#fff4e6,#ffe0c2)','linear-gradient(135deg,#f3e8ff,#e4ccff)','linear-gradient(135deg,#e8f2ff,#d0e4ff)','linear-gradient(135deg,#e6faf0,#c8f5dc)','linear-gradient(135deg,#fce8f3,#f8b4d4)','linear-gradient(135deg,#e0f7fa,#b2ebf2)'];
+const AVATARS=['🐱','🐶','🦊','🐻','🐼','🐨','🦁','🐯','🐸','🐵','🦄','🐰','🐧','🦉','🦋','🐳'];
+function gradeFromMarks(m){const n=parseFloat(m);if(isNaN(n)||n<0)return null;for(const g of GRADE_MAP)if(n>=g.min)return g;return GRADE_MAP[GRADE_MAP.length-1]}
+function uid(){return Math.random().toString(36).slice(2,9)}
+
+let gpaCards=JSON.parse(localStorage.getItem('mckru_gpa2')||'null')||[{id:uid(),name:'Subject 1',marks:'',credits:3,lab:false}];
+let semesters=JSON.parse(localStorage.getItem('mckru_cgpa2')||'null')||[{id:uid(),name:'Semester 1',gpa:''}];
+let isDark=localStorage.getItem('mckru_dark2')==='true';
+let userName=localStorage.getItem('mckru_name')||'';
+let userAvatar=localStorage.getItem('mckru_avatar')||'🐱';
+let selectedAvatar=userAvatar;
+let onboardStep=0;
+const onboards=[
+  {emoji:'📚',bg:'linear-gradient(135deg,#fff4e6,#ffe0c2)',title:'Track Your Grades',desc:'Enter your marks for each subject and let us calculate your GPA automatically.'},
+  {emoji:'🎓',bg:'linear-gradient(135deg,#f3e8ff,#e4ccff)',title:'Calculate CGPA',desc:'Add multiple semesters and track your cumulative GPA across all of them.'},
+  {emoji:'💾',bg:'linear-gradient(135deg,#e8f2ff,#d0e4ff)',title:'Save Everything',desc:'Your data is saved locally. Come back anytime to check your progress!'}
+];
+
+function init(){
+  if(isDark)document.body.classList.add('dark');
+  updateToggles();renderGradeRef();renderGPACards();renderCGPACards();updateHome();applyUserProfile();
+  renderAvatarGrid();
+  setTimeout(()=>{document.getElementById('splash').classList.add('hide');setTimeout(()=>{document.getElementById('splash').style.display='none';showOnboarding()},600)},2000);
+}
+
+function showOnboard(step){
+  if(step>=4){finishOnboarding();return}
+  onboardStep=step;
+  const isLast=step===3;
+  document.getElementById('onboarding').classList.toggle('show',!isLast);
+  document.getElementById('onboardingName').classList.toggle('show',isLast);
+  for(let i=0;i<4;i++){
+    const d1=document.getElementById('dot'+i);
+    const d2=document.getElementById('dot'+i+'b');
+    if(d1)d1.classList.toggle('active',i===step);
+    if(d2)d2.classList.toggle('active',i===step);
+  }
+  if(!isLast){
+    const o=onboards[step];
+    document.getElementById('onboardEmoji').textContent=o.emoji;
+    document.getElementById('onboardVisual').style.background=o.bg;
+    document.getElementById('onboardTitle').textContent=o.title;
+    document.getElementById('onboardDesc').textContent=o.desc;
+    document.getElementById('onboardBtn').textContent='Next →';
+  }
+}
+function showOnboarding(){if(localStorage.getItem('mckru_onboarded2')){document.getElementById('shell').classList.add('show');return}showOnboard(0)}
+function nextOnboard(){showOnboard(onboardStep+1)}
+function finishOnboarding(){document.getElementById('onboarding').classList.remove('show');document.getElementById('onboardingName').classList.remove('show');document.getElementById('shell').classList.add('show');localStorage.setItem('mckru_onboarded2','1')}
+
+function toggleDark(){isDark=!isDark;document.body.classList.toggle('dark',isDark);localStorage.setItem('mckru_dark2',isDark);updateToggles()}
+function updateToggles(){
+  ['darkToggle','darkToggle2'].forEach(id=>{const t=document.getElementById(id);if(!t)return;t.classList.toggle('dark',isDark);const k=document.getElementById(id==='darkToggle'?'toggleKnob':'toggleKnob2');if(k)k.textContent=isDark?'🌙':'☀️'});
+}
+
+function switchPage(p){
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===p));
+  if(p==='storage')renderStorage();if(p==='home')updateHome();
+}
+
+function renderGPACards(){
+  const el=document.getElementById('gpaCards');
+  let totalPts=0,totalCr=0;
+  el.innerHTML=gpaCards.map((card,i)=>{
+    const marks=parseFloat(card.marks);const grade=gradeFromMarks(marks);
+    const cr=card.credits||3;const isLab=!!card.lab;const effectiveCr=isLab?cr+1:cr;
+    if(grade&&card.marks!==''){totalPts+=grade.gpa*effectiveCr;totalCr+=effectiveCr}
+    const creditPills=[1,2,3,4,5].map(c=>`<div class="gpa-credit-pill${c===cr?' active':''}" onclick="setCredits(${i},${c})">${c}</div>`).join('');
+    return`<div class="gpa-card">
+      <div class="gpa-card-top">
+        <div class="gpa-card-num">${i+1}</div>
+        <input class="gpa-card-name" value="${esc(card.name)}" onchange="gpaCards[${i}].name=this.value;saveGPA()">
+        <button class="gpa-card-del" onclick="removeGPACard(${i})" ${gpaCards.length<=1?'disabled':''}>✕</button>
+      </div>
+      <div class="gpa-field"><label>Marks (out of 100)</label><input type="number" min="0" max="100" placeholder="Enter your marks..." value="${card.marks}" oninput="gpaCards[${i}].marks=this.value;saveGPA();renderGPACards()"></div>
+      <div class="gpa-credits-row">
+        <div class="gpa-credits-label">Credit Hours${isLab?` <span style="color:#06b6d4;font-weight:800">(${effectiveCr} w/ lab)</span>`:''}</div>
+        <div class="gpa-credits-pills">${creditPills}</div>
+      </div>
+      <div class="gpa-credits-row" style="margin-bottom:14px">
+        <div class="gpa-credits-label">Lab Subject</div>
+        <div class="gpa-lab-toggle" onclick="toggleLab(${i})">
+          <div class="gpa-lab-pill${isLab?' active':''}">
+            <div class="gpa-lab-check"></div>
+            ${isLab?'Lab ✓':'Lab'}
+          </div>
+        </div>
+      </div>
+      <div class="gpa-grade-row"><div class="gpa-grade-label">Grade & GPA</div>${grade?`<div class="gpa-grade-badge" style="background:${grade.color}">${grade.letter} · ${grade.gpa.toFixed(1)} · ${effectiveCr} cr</div>`:`<div style="font-size:13px;color:var(--muted);font-weight:600">Enter marks</div>`}</div>
+    </div>`}).join('');
+  const result=document.getElementById('gpaResult');
+  if(totalCr>0){const gpa=totalPts/totalCr;result.style.display='';document.getElementById('gpaResultVal').textContent=gpa.toFixed(2);document.getElementById('gpaResultGrade').textContent=gpa>=3.5?'🌟 Excellent!':gpa>=3.0?'👍 Good Job!':gpa>=2.5?'📈 Keep Going!':'💪 You Can Do It!'}
+  else result.style.display='none';
+  saveGPA();
+}
+function setCredits(i,c){gpaCards[i].credits=c;saveGPA();renderGPACards()}
+function toggleLab(i){gpaCards[i].lab=!gpaCards[i].lab;saveGPA();renderGPACards()}
+function addGPACard(){gpaCards.push({id:uid(),name:`Subject ${gpaCards.length+1}`,marks:'',credits:3,lab:false});saveGPA();renderGPACards()}
+function removeGPACard(i){if(gpaCards.length<=1)return;gpaCards.splice(i,1);saveGPA();renderGPACards()}
+function saveGPA(){localStorage.setItem('mckru_gpa2',JSON.stringify(gpaCards))}
+
+function renderCGPACards(){
+  const el=document.getElementById('cgpaCards');
+  let totalPts=0,totalCr=0;
+  el.innerHTML=semesters.map((sem,i)=>{
+    const gpa=parseFloat(sem.gpa);const valid=gpa&&!isNaN(gpa)&&gpa>=0&&gpa<=4;
+    if(valid){totalPts+=gpa;totalCr++}
+    return`<div class="cgpa-card">
+      <div class="cgpa-card-top">
+        <div class="cgpa-card-num">${i+1}</div>
+        <input class="cgpa-card-name" value="${esc(sem.name)}" onchange="semesters[${i}].name=this.value;saveCGPA()">
+        <button class="cgpa-card-del" onclick="removeSemester(${i})" ${semesters.length<=1?'disabled':''}>✕</button>
+      </div>
+      <div class="cgpa-field"><label>Semester GPA</label><input type="number" min="0" max="4" step="0.01" placeholder="0.00 — 4.00" value="${sem.gpa}" oninput="semesters[${i}].gpa=this.value;saveCGPA();renderCGPACards()"><div class="field-hint">Maximum GPA is 4.00</div></div>
+      ${valid?`<div class="gpa-grade-row"><div class="gpa-grade-label">Status</div><div class="gpa-grade-badge" style="background:${gpa>=3.5?'#22c55e':gpa>=3.0?'#3b82f6':gpa>=2.0?'#f59e0b':'#ef4444'}">${gpa>=3.5?'🌟 Excellent':gpa>=3.0?'👍 Good':gpa>=2.0?'📈 Average':'💪 Keep Trying'}</div></div>`:''}
+    </div>`}).join('');
+  const result=document.getElementById('cgpaResult');
+  if(totalCr>0){result.style.display='';document.getElementById('cgpaResultVal').textContent=(totalPts/totalCr).toFixed(2)}
+  else result.style.display='none';
+  saveCGPA();
+}
+function addSemester(){semesters.push({id:uid(),name:`Semester ${semesters.length+1}`,gpa:''});saveCGPA();renderCGPACards()}
+function removeSemester(i){if(semesters.length<=1)return;semesters.splice(i,1);semesters.forEach((s,j)=>{s.name=`Semester ${j+1}`});saveCGPA();renderCGPACards()}
+function saveCGPA(){localStorage.setItem('mckru_cgpa2',JSON.stringify(semesters))}
+
+function renderStorage(){
+  const el=document.getElementById('storageContent');
+  const hasGPA=gpaCards.some(c=>c.marks!=='');
+  const hasCGPA=semesters.some(s=>s.gpa!=='');
+  if(!hasGPA&&!hasCGPA){el.innerHTML=`<div class="storage-empty"><div class="storage-empty-icon">📂</div><p>No saved data yet.<br>Start calculating to see results here!</p></div>`;return}
+  let html='';
+  if(hasGPA){
+    html+=`<div class="storage-section"><div class="storage-section-title">📝 GPA Records</div>`;
+    gpaCards.filter(c=>c.marks!=='').forEach((c,i)=>{
+      const grade=gradeFromMarks(c.marks);
+      const cr=c.credits||3;const isLab=!!c.lab;const effectiveCr=isLab?cr+1:cr;
+      if(grade)html+=`<div class="storage-item"><div class="storage-item-left"><div class="storage-item-icon" style="background:${BG_GRAD[i%BG_GRAD.length]};color:${COLORS[i%COLORS.length]}">${grade.letter}</div><div><div class="storage-item-name">${esc(c.name)}${isLab?' 🔬':''}</div><div class="storage-item-meta">Marks: ${c.marks}/100 · ${effectiveCr} cr</div></div></div><div class="storage-item-val" style="color:${grade.color}">${grade.gpa.toFixed(1)}</div></div>`;
+    });
+    html+=`</div>`;
+  }
+  if(hasCGPA){
+    html+=`<div class="storage-section"><div class="storage-section-title">🎓 CGPA Records</div>`;
+    semesters.filter(s=>s.gpa!=='').forEach((s,i)=>{
+      html+=`<div class="storage-item"><div class="storage-item-left"><div class="storage-item-icon" style="background:${BG_GRAD[i%BG_GRAD.length]};color:${COLORS[i%COLORS.length]}">S${i+1}</div><div><div class="storage-item-name">${esc(s.name)}</div><div class="storage-item-meta">GPA entered</div></div></div><div class="storage-item-val" style="color:${COLORS[i%COLORS.length]}">${parseFloat(s.gpa).toFixed(2)}</div></div>`;
+    });
+    html+=`</div>`;
+  }
+  el.innerHTML=html;
+}
+
+function updateHome(){
+  let totalPts=0,semCount=0;
+  semesters.forEach(s=>{const g=parseFloat(s.gpa);if(!isNaN(g)&&g>=0&&g<=4){totalPts+=g;semCount++}});
+  const cgpa=semCount>0?(totalPts/semCount):null;
+  document.getElementById('homeCGPA').textContent=cgpa!==null?cgpa.toFixed(2):'—';
+  document.getElementById('homeSub').textContent=cgpa!==null?`Across ${semCount} semester${semCount!==1?'s':''}`:'Start adding your grades';
+  document.getElementById('homeSems').textContent=semCount;
+  const subCount=gpaCards.filter(c=>c.marks!=='').length;
+  document.getElementById('homeSubs').textContent=subCount;
+  document.getElementById('homeAvgGPA').textContent=semCount>0?(totalPts/semCount).toFixed(2):'—';
+  const totalCredits=gpaCards.reduce((sum,c)=>{if(c.marks!==''){const cr=c.credits||3;return sum+(c.lab?cr+1:cr)}return sum},0);
+  document.getElementById('homeCredits').textContent=totalCredits;
+
+  const motivationEl=document.getElementById('homeMotivationText');
+  if(cgpa===null){
+    motivationEl.textContent='You got this! Start calculating your grades';
+  }else if(cgpa>=3.5){
+    motivationEl.textContent="You're a superstar! Keep it up!";
+  }else if(cgpa>=3.0){
+    motivationEl.textContent='Great work! You are doing amazing!';
+  }else if(cgpa>=2.0){
+    motivationEl.textContent='Keep pushing! Every point counts!';
+  }else{
+    motivationEl.textContent="Don't give up! You can improve!";
+  }
+}
+
+function renderGradeRef(){
+  document.getElementById('gradeRef').innerHTML=GRADE_MAP.map(g=>`<div class="grade-row"><div class="grade-row-marks">${g.min}+</div><div class="grade-row-letter" style="background:${g.color}">${g.letter}</div><div class="grade-row-points">${g.gpa.toFixed(1)} GPA</div></div>`).join('');
+}
+
+function resetApp(){if(!confirm('Reset everything?'))return;gpaCards=[{id:uid(),name:'Subject 1',marks:'',credits:3,lab:false}];semesters=[{id:uid(),name:'Semester 1',gpa:''}];userName='';userAvatar='🐱';selectedAvatar='🐱';localStorage.clear();renderGPACards();renderCGPACards();updateHome();applyUserProfile();switchPage('home')}
+function clearAll(){if(!confirm('Clear all saved data?'))return;gpaCards.forEach(c=>{c.marks=''});semesters.forEach(s=>{s.gpa=''});saveGPA();saveCGPA();renderGPACards();renderCGPACards();updateHome();renderStorage()}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function renderAvatarGrid(){
+  const grid=document.getElementById('avatarGrid');
+  if(!grid)return;
+  grid.innerHTML=AVATARS.map(a=>`<div class="onboard-avatar-option${a===selectedAvatar?' selected':''}" onclick="selectAvatar('${a}')">${a}</div>`).join('');
+}
+function selectAvatar(a){
+  selectedAvatar=a;
+  document.querySelectorAll('.onboard-avatar-option').forEach(el=>el.classList.toggle('selected',el.textContent===a));
+}
+function finishOnboardName(){
+  const nameInput=document.getElementById('onboardNameInput');
+  userName=nameInput.value.trim()||'Student';
+  userAvatar=selectedAvatar;
+  localStorage.setItem('mckru_name',userName);
+  localStorage.setItem('mckru_avatar',userAvatar);
+  applyUserProfile();
+  finishOnboarding();
+}
+function applyUserProfile(){
+  document.getElementById('topbarAvatar').textContent=userAvatar;
+  document.getElementById('topbarName').textContent=userName||'Work Go Continue';
+  document.getElementById('homeGreeting').textContent=userName?`Hey ${userName}! 👋`:'Hey there! 👋';
+}
+
+init();
+</script>
+</body>
+</html>

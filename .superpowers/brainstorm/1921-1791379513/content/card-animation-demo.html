@@ -1,0 +1,144 @@
+<h2>Card animation demo — create & delete</h2>
+<p class="subtitle">Har option ko khud chala kar dekhein: <b>＋ Add card</b> se create animation, <b>🗑</b> se delete. Card pe click karke select bhi kar sakte hain. Phir terminal mein batayein konsa pasand ya kya mix karna hai.</p>
+
+<style>
+  .demo { margin-top: 14px; padding: 14px; background: #F7F8FA; border: 1px solid #D9DEE7; border-radius: 14px; }
+  .demo-list { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .32s ease, opacity .32s ease; }
+  .row.removing { grid-template-rows: 0fr; opacity: 0; }
+  .row > .clip { overflow: hidden; min-height: 0; }
+  .cardmini {
+    display: flex; align-items: center; gap: 10px;
+    background: #FFFFFF; border: 1px solid #D9DEE7; border-radius: 14px;
+    padding: 10px 12px;
+  }
+  .cardmini .idx {
+    width: 26px; height: 26px; border-radius: 8px; flex: none;
+    background: #EAF3FF; color: #1561CB; font: 700 11px/26px ui-monospace, monospace; text-align: center;
+  }
+  .cardmini .nm { flex: 1; font: 700 13.5px system-ui, sans-serif; color: #111111; }
+  .cardmini .chip { font: 700 11px system-ui, sans-serif; color: #6B7280; background: #F0F2F5; border-radius: 8px; padding: 4px 8px; }
+  .cardmini .del { border: none; background: none; cursor: pointer; color: #DC2626; font-size: 15px; padding: 4px; }
+  .demo-btns { display: flex; gap: 8px; margin-top: 12px; }
+  .demo-btns button {
+    border: 1px solid #D9DEE7; background: #FFFFFF; border-radius: 10px; cursor: pointer;
+    font: 600 12.5px system-ui, sans-serif; color: #111111; padding: 8px 14px;
+  }
+  .demo-btns button:hover { border-color: #1677FF; color: #1561CB; }
+  .impl { font-size: 12px; color: #6B7280; margin-top: 10px; }
+
+  /* ---- create: shared row entrance ---- */
+  .row.new { animation: rowIn .34s ease both; }
+  @keyframes rowIn { from { grid-template-rows: 0fr; opacity: 0; } to { grid-template-rows: 1fr; opacity: 1; } }
+
+  /* ---- option A: slide & fade ---- */
+  [data-demo="a"] .row.new .cardmini { animation: aIn .34s cubic-bezier(.2,.8,.3,1) both; }
+  [data-demo="a"] .row.removing .cardmini { animation: aOut .28s cubic-bezier(.4,0,.6,1) both; }
+  @keyframes aIn  { from { transform: translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes aOut { from { transform: none; opacity: 1; } to { transform: translateX(48px); opacity: 0; } }
+
+  /* ---- option B: scale pop ---- */
+  [data-demo="b"] .row.new .cardmini { animation: bIn .38s cubic-bezier(.34,1.56,.64,1) both; }
+  [data-demo="b"] .row.removing .cardmini { animation: bOut .24s ease-in both; }
+  @keyframes bIn  { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes bOut { from { transform: scale(1); opacity: 1; } to { transform: scale(.88); opacity: 0; } }
+
+  /* ---- option C: expand / collapse ---- */
+  [data-demo="c"] .row.new .cardmini { animation: cIn .32s ease both; }
+  [data-demo="c"] .row.removing .cardmini { animation: cOut .3s ease both; }
+  @keyframes cIn  { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes cOut { from { opacity: 1; } to { opacity: 0; } }
+</style>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Slide &amp; fade</h3>
+      <p>Create: card upar se slide hoke aati hai. Delete: right ki taraf slide karke fade out — baaki cards smoothly neeche shift hote hain.</p>
+      <div class="demo" onclick="event.stopPropagation()">
+        <div class="demo-list" data-demo="a">
+          <div class="row"><div class="clip"><div class="cardmini"><span class="idx">01</span><span class="nm">MATH 101</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div></div>
+          <div class="row"><div class="clip"><div class="cardmini"><span class="idx">02</span><span class="nm">PHYSICS 101</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div></div>
+        </div>
+        <div class="demo-btns">
+          <button onclick="demoAdd(this)">＋ Add card</button>
+          <button onclick="demoReset(this)">↺ Reset</button>
+        </div>
+        <div class="impl">Flutter: AnimatedList insertItem/removeItem, Curves.easeOut / slide offset</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Scale pop</h3>
+      <p>Create: halka overshoot ke saath pop (bounce feel). Delete: chhota hokar fade — playful, snappy.</p>
+      <div class="demo" onclick="event.stopPropagation()">
+        <div class="demo-list" data-demo="b">
+          <div class="row"><div class="clip"><div class="cardmini"><span class="idx">01</span><span class="nm">MATH 101</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div></div>
+          <div class="row"><div class="clip"><div class="cardmini"><span class="idx">02</span><span class="nm">PHYSICS 101</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div></div>
+        </div>
+        <div class="demo-btns">
+          <button onclick="demoAdd(this)">＋ Add card</button>
+          <button onclick="demoReset(this)">↺ Reset</button>
+        </div>
+        <div class="impl">Flutter: AnimatedList, Curves.easeOutBack (scale 0.9 → 1)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Expand / collapse</h3>
+      <p>Create: card ki height 0 se khul ke aati hai (accordion jaisi). Delete: height collapse hoke gayab — content shift sabse smooth.</p>
+      <div class="demo" onclick="event.stopPropagation()">
+        <div class="demo-list" data-demo="c">
+          <div class="row"><div class="clip"><div class="cardmini"><span class="idx">01</span><span class="nm">MATH 101</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div></div>
+          <div class="row"><div class="clip"><div class="cardmini"><span class="idx">02</span><span class="nm">PHYSICS 101</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div></div>
+        </div>
+        <div class="demo-btns">
+          <button onclick="demoAdd(this)">＋ Add card</button>
+          <button onclick="demoReset(this)">↺ Reset</button>
+        </div>
+        <div class="impl">Flutter: AnimatedList + SizeTransition (height collapse)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let demoCount = 2;
+  const subjects = ['CHEMISTRY 102', 'ENGLISH 101', 'COMPUTER 201', 'STATISTICS 110'];
+
+  function demoList(btn) { return btn.closest('.demo').querySelector('.demo-list'); }
+
+  function demoAdd(btn) {
+    const list = demoList(btn);
+    const n = ++demoCount;
+    const row = document.createElement('div');
+    row.className = 'row new';
+    row.innerHTML = '<div class="clip"><div class="cardmini"><span class="idx">' + String(n).padStart(2, '0') +
+      '</span><span class="nm">' + subjects[(n - 3) % subjects.length] +
+      '</span><span class="chip">3 cr</span><button class="del" onclick="demoDel(this)" title="Delete">🗑</button></div></div>';
+    list.appendChild(row);
+    setTimeout(() => row.classList.remove('new'), 450);
+  }
+
+  function demoDel(trashBtn) {
+    const list = trashBtn.closest('.demo-list');
+    const row = trashBtn.closest('.row');
+    if (row.classList.contains('removing')) return;
+    row.classList.add('removing');
+    setTimeout(() => row.remove(), 360);
+  }
+
+  function demoReset(btn) {
+    const list = demoList(btn);
+    demoCount = 2;
+    list.querySelectorAll('.row.removing').forEach(r => r.remove());
+    while (list.children.length > 2) list.lastElementChild.remove();
+  }
+</script>

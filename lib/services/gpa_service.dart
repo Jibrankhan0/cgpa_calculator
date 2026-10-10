@@ -1,74 +1,77 @@
+class GradeInfo {
+  final int minMarks;
+  final String letter;
+  final double gpa;
+  final int colorValue;
+
+  const GradeInfo({
+    required this.minMarks,
+    required this.letter,
+    required this.gpa,
+    required this.colorValue,
+  });
+}
+
 class GpaService {
-  static const Map<String, double> gradePoints = {
-    'A': 4.0,
-    'A-': 3.7,
-    'B+': 3.3,
-    'B': 3.0,
-    'B-': 2.7,
-    'C+': 2.3,
-    'C': 2.0,
-    'C-': 1.7,
-    'D': 1.0,
-    'F': 0.0,
-  };
+  static const List<GradeInfo> gradeMap = [
+    GradeInfo(minMarks: 85, letter: 'A', gpa: 4.0, colorValue: 0xFF22C55E),
+    GradeInfo(minMarks: 80, letter: 'A-', gpa: 3.7, colorValue: 0xFF34C759),
+    GradeInfo(minMarks: 75, letter: 'B+', gpa: 3.3, colorValue: 0xFF3B82F6),
+    GradeInfo(minMarks: 70, letter: 'B', gpa: 3.0, colorValue: 0xFF06B6D4),
+    GradeInfo(minMarks: 65, letter: 'B-', gpa: 2.7, colorValue: 0xFF8B5CF6),
+    GradeInfo(minMarks: 61, letter: 'C+', gpa: 2.3, colorValue: 0xFFA855F7),
+    GradeInfo(minMarks: 58, letter: 'C', gpa: 2.0, colorValue: 0xFFF59E0B),
+    GradeInfo(minMarks: 55, letter: 'C-', gpa: 1.7, colorValue: 0xFFF97316),
+    GradeInfo(minMarks: 50, letter: 'D', gpa: 1.0, colorValue: 0xFFEF4444),
+    GradeInfo(minMarks: 0, letter: 'F', gpa: 0.0, colorValue: 0xFF6B7280),
+  ];
 
-  static List<String> get grades => gradePoints.keys.toList();
-
-  static double getPoints(String grade) => gradePoints[grade] ?? 0.0;
-
-  static String getGradeFromMarks(double marks, {bool isPractical = false}) {
-    final effectiveMarks = isPractical ? marks * 2 : marks;
-    if (effectiveMarks >= 85) return 'A';
-    if (effectiveMarks >= 80) return 'A-';
-    if (effectiveMarks >= 75) return 'B+';
-    if (effectiveMarks >= 70) return 'B';
-    if (effectiveMarks >= 65) return 'B-';
-    if (effectiveMarks >= 61) return 'C+';
-    if (effectiveMarks >= 58) return 'C';
-    if (effectiveMarks >= 55) return 'C-';
-    if (effectiveMarks >= 50) return 'D';
-    return 'F';
+  static GradeInfo? getGradeFromMarks(double marks) {
+    if (marks.isNaN || marks < 0) return null;
+    for (final g in gradeMap) {
+      if (marks >= g.minMarks) return g;
+    }
+    return gradeMap.last;
   }
 
-  static double getRepresentativeMarks(
-    String grade, {
-    bool isPractical = false,
-  }) {
-    double marks = 0.0;
-    switch (grade) {
-      case 'A':
-        marks = 85.0;
-        break;
-      case 'A-':
-        marks = 80.0;
-        break;
-      case 'B+':
-        marks = 75.0;
-        break;
-      case 'B':
-        marks = 70.0;
-        break;
-      case 'B-':
-        marks = 65.0;
-        break;
-      case 'C+':
-        marks = 61.0;
-        break;
-      case 'C':
-        marks = 58.0;
-        break;
-      case 'C-':
-        marks = 55.0;
-        break;
-      case 'D':
-        marks = 50.0;
-        break;
-      case 'F':
-        marks = 0.0;
-        break;
-      default:
-        marks = 0.0;
-    }
-    return isPractical ? marks / 2 : marks;
+  static String getMotivationMessage(double? cgpa) {
+    if (cgpa == null) return 'You got this! Start calculating your grades';
+    if (cgpa >= 3.5) return "You're a superstar! Keep it up!";
+    if (cgpa >= 3.0) return 'Great work! You are doing amazing!';
+    if (cgpa >= 2.0) return 'Keep pushing! Every point counts!';
+    return "Don't give up! You can improve!";
+  }
+
+  static String getGpaMessage(double gpa) {
+    if (gpa >= 3.5) return 'Excellent!';
+    if (gpa >= 3.0) return 'Good Job!';
+    if (gpa >= 2.5) return 'Keep Going!';
+    return 'You Can Do It!';
+  }
+
+  static String getSemesterStatus(double gpa) {
+    if (gpa >= 3.5) return 'Excellent';
+    if (gpa >= 3.0) return 'Good';
+    if (gpa >= 2.0) return 'Average';
+    return 'Keep Trying';
+  }
+
+  static String? validateMarks(String input, {bool isLab = false}) {
+    if (input.isEmpty) return null;
+    final v = double.tryParse(input);
+    if (v == null) return 'Invalid number';
+    if (v < 0) return 'Marks cannot be negative';
+    if (isLab && v > 50) return 'Marks must be 0–50';
+    if (!isLab && v > 100) return 'Marks must be 0–100';
+    return null;
+  }
+
+  static String? validateGpaInput(String input) {
+    if (input.isEmpty) return null;
+    final v = double.tryParse(input);
+    if (v == null) return 'Invalid number';
+    if (v < 0) return 'GPA cannot be negative';
+    if (v > 4) return 'GPA must be 0.00–4.00';
+    return null;
   }
 }

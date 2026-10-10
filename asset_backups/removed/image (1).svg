@@ -1,0 +1,44 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <title>muja Education Logo</title>
+  <desc>Minimalist logo for muja education app featuring a stylized letter m and a graduation cap element.</desc>
+  
+  <!-- Background -->
+  <rect width="800" height="800" fill="#FFFFFF" />
+  
+  <style>
+    .brand-text {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 96px;
+      font-weight: 700;
+      letter-spacing: 12px;
+      fill: #1E3A5F;
+    }
+    .icon-m {
+      fill: none;
+      stroke: #1E3A5F;
+      stroke-width: 42;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .cap-top {
+      fill: #D4AF37;
+    }
+  </style>
+
+  <g transform="translate(0, -30)">
+    <!-- Stylized lowercase 'm' mark -->
+    <!-- Represents both the letter and open book pages -->
+    <path class="icon-m" d="M310,500 V380 C310,325 400,325 400,380 C400,325 490,325 490,380 V500" />
+    
+    <!-- Minimalist Graduation Cap (Mortarboard) -->
+    <!-- Positioned atop the first pillar of the 'm' -->
+    <path class="cap-top" d="M235,380 L310,340 L385,380 L310,420 Z" />
+    
+    <!-- Tassel detail -->
+    <line x1="385" y1="380" x2="385" y2="425" stroke="#D4AF37" stroke-width="8" stroke-linecap="round" />
+    <circle cx="385" cy="435" r="10" fill="#D4AF37" />
+
+    <!-- Brand Typography -->
+    <text x="400" y="630" text-anchor="middle" class="brand-text">muja</text>
+  </g>
+</svg>

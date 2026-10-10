@@ -1,0 +1,90 @@
+<h2>Data page — C layout, app ke clean style mein</h2>
+<p class="subtitle">Semester chips + ek table · light theme, cards, wahi spacing/typography jo baqi app mein hai</p>
+
+<div class="mockup">
+  <div class="mockup-header">Data tab — final look?</div>
+  <div class="mockup-body" style="background:#f7f9fc;padding:16px;font-family:-apple-system,'Segoe UI',sans-serif">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:800;color:#0f172a;letter-spacing:.4px">SAVED DATA</div>
+      <button style="border:1px solid #dbe3ee;background:#fff;border-radius:10px;padding:7px 12px;font-size:11.5px;font-weight:700;color:#334155;cursor:pointer">⬇ Export Excel</button>
+    </div>
+
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="background:#2563eb;color:#fff;padding:6px 13px;border-radius:999px;font-size:11.5px;font-weight:700">Semester 1</span>
+      <span style="background:#fff;border:1px solid #dbe3ee;color:#475569;padding:6px 13px;border-radius:999px;font-size:11.5px;font-weight:600">Semester 2</span>
+      <span style="background:#fff;border:1px solid #dbe3ee;color:#475569;padding:6px 13px;border-radius:999px;font-size:11.5px;font-weight:600">Semester 3</span>
+      <span style="background:#fff;border:1px dashed #cbd5e1;color:#94a3b8;padding:6px 13px;border-radius:999px;font-size:11.5px;font-weight:700">+ Add</span>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e6ebf3;border-radius:14px;padding:6px 12px 10px;box-shadow:0 1px 2px rgba(15,23,42,.04)">
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px">
+          <tr style="color:#94a3b8;font-size:10px;letter-spacing:.5px;font-weight:700">
+            <td style="padding:9px 4px">SUBJECT</td>
+            <td style="text-align:center">CR</td>
+            <td style="text-align:center">MID<br><span style="font-weight:500">/25</span></td>
+            <td style="text-align:center">FINAL<br><span style="font-weight:500">/50</span></td>
+            <td style="text-align:center">SEC<br><span style="font-weight:500">/25</span></td>
+            <td style="text-align:center">LAB<br><span style="font-weight:500">/50</span></td>
+            <td style="text-align:center">TOTAL</td>
+            <td style="text-align:center">GRADE</td>
+          </tr>
+          <tr style="border-top:1px solid #eef2f7">
+            <td style="padding:10px 4px;font-weight:700;color:#0f172a">Physics</td>
+            <td style="text-align:center;color:#475569">3</td>
+            <td style="text-align:center;color:#334155">20</td>
+            <td style="text-align:center;color:#334155">42</td>
+            <td style="text-align:center;color:#334155">22</td>
+            <td style="text-align:center;color:#cbd5e1">—</td>
+            <td style="text-align:center;font-weight:800;color:#0f172a">84</td>
+            <td style="text-align:center"><span style="background:#e0eaff;color:#2563eb;font-weight:800;padding:3px 8px;border-radius:7px;font-size:10.5px">B+</span></td>
+          </tr>
+          <tr style="border-top:1px solid #eef2f7">
+            <td style="padding:10px 4px;font-weight:700;color:#0f172a">Math-I</td>
+            <td style="text-align:center;color:#475569">3</td>
+            <td style="text-align:center;color:#334155">23</td>
+            <td style="text-align:center;color:#334155">46</td>
+            <td style="text-align:center;color:#334155">24</td>
+            <td style="text-align:center;color:#cbd5e1">—</td>
+            <td style="text-align:center;font-weight:800;color:#0f172a">93</td>
+            <td style="text-align:center"><span style="background:#e0eaff;color:#2563eb;font-weight:800;padding:3px 8px;border-radius:7px;font-size:10.5px">A</span></td>
+          </tr>
+          <tr style="border-top:1px solid #eef2f7">
+            <td style="padding:10px 4px;font-weight:700;color:#0f172a">Chemistry Lab <span style="background:#dff5e9;color:#16a34a;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:4px">LAB</span></td>
+            <td style="text-align:center;color:#475569">1</td>
+            <td style="text-align:center;color:#334155">18</td>
+            <td style="text-align:center;color:#334155">39</td>
+            <td style="text-align:center;color:#334155">20</td>
+            <td style="text-align:center;color:#16a34a;font-weight:700">45</td>
+            <td style="text-align:center;font-weight:800;color:#0f172a">122</td>
+            <td style="text-align:center"><span style="background:#e0eaff;color:#2563eb;font-weight:800;padding:3px 8px;border-radius:7px;font-size:10.5px">A</span></td>
+          </tr>
+          <tr style="border-top:2px solid #e6ebf7;background:#f8fafd">
+            <td style="padding:9px 4px;font-weight:800;color:#0f172a">Semester 1</td>
+            <td colspan="5" style="color:#94a3b8;font-size:10.5px">3 subjects · 7 credits</td>
+            <td style="text-align:center;color:#94a3b8;font-size:10.5px">—</td>
+            <td style="text-align:center"><span style="background:#2563eb;color:#fff;font-weight:800;padding:3px 9px;border-radius:7px;font-size:11px">3.42</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div style="font-size:10px;color:#94a3b8;margin-top:8px;text-align:center">table horizontally scrollable · GPA footer row har sheet ke neeche</div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="yes" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Yes — aisa hi chahiye</h3>
+      <p>Isi layout aur style ko lock kar do</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Almost, lekin kuch change chahiye</h3>
+      <p>Terminal mein batao kya adjust karna hai</p>
+    </div>
+  </div>
+</div>

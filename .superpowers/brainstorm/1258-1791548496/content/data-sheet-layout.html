@@ -1,0 +1,74 @@
+<h2>Data page kaunsi layout mein dikhe?</h2>
+<p class="subtitle">"Excel sheet" wala saved-data view — 8 semesters, har subject ke Mid 25 / Final 50 / Sectional 25 (+ Lab 50 agar ho)</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:10px;font-family:monospace;background:#111;padding:8px;border-radius:6px;color:#ddd;overflow:hidden">
+        <div style="color:#7dd3fc;font-weight:700;margin-bottom:4px">▾ SEMESTER 1 &nbsp;·&nbsp; GPA 3.42</div>
+        <table style="width:100%;border-collapse:collapse;font-size:9px">
+          <tr style="color:#94a3b8"><td>Subject</td><td>Cr</td><td>Mid</td><td>Fin</td><td>Sec</td><td>Lab</td><td>Tot</td><td>Gr</td></tr>
+          <tr style="border-top:1px solid #333"><td>Physics</td><td>3</td><td>20</td><td>42</td><td>22</td><td>—</td><td>84</td><td>B+</td></tr>
+          <tr style="border-top:1px solid #333"><td>Math-I</td><td>3</td><td>23</td><td>46</td><td>24</td><td>—</td><td>93</td><td>A</td></tr>
+          <tr style="border-top:1px solid #333"><td>Chem Lab</td><td>1</td><td>18</td><td>39</td><td>20</td><td>45</td><td>122</td><td>A</td></tr>
+        </table>
+        <div style="color:#7dd3fc;font-weight:700;margin:8px 0 4px">▾ SEMESTER 2 &nbsp;·&nbsp; GPA 3.10</div>
+        <table style="width:100%;border-collapse:collapse;font-size:9px">
+          <tr style="color:#94a3b8"><td>Subject</td><td>Cr</td><td>Mid</td><td>Fin</td><td>Sec</td><td>Lab</td><td>Tot</td><td>Gr</td></tr>
+          <tr style="border-top:1px solid #333"><td>Physics-II</td><td>3</td><td>19</td><td>40</td><td>21</td><td>—</td><td>80</td><td>B</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · Semester sections</h3>
+      <p>Har semester ka apna chhota table — upar neeche scroll, andar table mein side scroll. Sab ek nazar.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:10px;font-family:monospace;background:#111;padding:8px;border-radius:6px;color:#ddd;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse;font-size:9px">
+          <tr style="color:#94a3b8"><td>Sem</td><td>Subject</td><td>Cr</td><td>Mid</td><td>Fin</td><td>Sec</td><td>Lab</td><td>Tot</td><td>Gr</td></tr>
+          <tr style="border-top:2px solid #7dd3fc;color:#7dd3fc;font-weight:700"><td colspan="9">SEMESTER 1 · GPA 3.42</td></tr>
+          <tr><td>1</td><td>Physics</td><td>3</td><td>20</td><td>42</td><td>22</td><td>—</td><td>84</td><td>B+</td></tr>
+          <tr style="border-top:1px solid #333"><td>1</td><td>Math-I</td><td>3</td><td>23</td><td>46</td><td>24</td><td>—</td><td>93</td><td>A</td></tr>
+          <tr style="border-top:2px solid #7dd3fc;color:#7dd3fc;font-weight:700"><td colspan="9">SEMESTER 2 · GPA 3.10</td></tr>
+          <tr><td>2</td><td>Physics-II</td><td>3</td><td>19</td><td>40</td><td>21</td><td>—</td><td>80</td><td>B</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · Ek badi sheet</h3>
+      <p>Excel ki tarah ek hi continuous table — semester rows alag se divide. Column list thodi aur lambi (Sem column extra).</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="font-size:10px;font-family:monospace;background:#111;padding:8px;border-radius:6px;color:#ddd;overflow:hidden">
+        <div style="display:flex;gap:4px;margin-bottom:6px;font-family:sans-serif">
+          <span style="background:#7dd3fc;color:#111;padding:2px 7px;border-radius:99px;font-weight:700">Sem 1</span>
+          <span style="border:1px solid #444;padding:2px 7px;border-radius:99px;color:#94a3b8">Sem 2</span>
+          <span style="border:1px solid #444;padding:2px 7px;border-radius:99px;color:#94a3b8">Sem 3</span>
+          <span style="border:1px solid #444;padding:2px 7px;border-radius:99px;color:#94a3b8">…</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:9px">
+          <tr style="color:#94a3b8"><td>Subject</td><td>Cr</td><td>Mid</td><td>Fin</td><td>Sec</td><td>Lab</td><td>Tot</td><td>Gr</td></tr>
+          <tr style="border-top:1px solid #333"><td>Physics</td><td>3</td><td>20</td><td>42</td><td>22</td><td>—</td><td>84</td><td>B+</td></tr>
+          <tr style="border-top:1px solid #333"><td>Math-I</td><td>3</td><td>23</td><td>46</td><td>24</td><td>—</td><td>93</td><td>A</td></tr>
+          <tr style="border-top:1px solid #333"><td>Chem Lab</td><td>1</td><td>18</td><td>39</td><td>20</td><td>45</td><td>122</td><td>A</td></tr>
+          <tr style="border-top:2px solid #7dd3fc"><td colspan="7" style="color:#7dd3fc;font-weight:700">Semester GPA</td><td style="color:#7dd3fc;font-weight:700">3.42</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · Semester tabs + ek table</h3>
+      <p>Upar semester chips (jaise GPA page plan mein) — ek waqt mein ek semester ki sheet. Mobile par sabse aasaan, lekin sab ek saath nahi dikhte.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <p class="subtitle">Note: har layout mein table phone par horizontally scroll hoga (columns zyada hain). Export button (Excel .xlsx) upar rahega teeno mein.</p>
+</div>

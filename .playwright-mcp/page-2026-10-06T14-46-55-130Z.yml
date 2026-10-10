@@ -1,0 +1,547 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]: Hi-fi redesign · iPhone · 360 × 780
+    - generic [ref=e6]: MCKRU CGPA Calculator
+  - generic [ref=e7]:
+    - group "Preview theme" [ref=e8]:
+      - button "Both" [ref=e9] [cursor=pointer]
+      - button "Light" [ref=e10] [cursor=pointer]
+      - button "Dark" [ref=e11] [cursor=pointer]
+    - paragraph [ref=e12]: Same build, two themes · flip any phone with its theme toggle or the dark-mode switch
+  - generic [ref=e13]: Light mode
+  - generic [ref=e16]:
+    - generic [ref=e19]:
+      - generic [ref=e21]: 9:41
+      - generic [ref=e37]:
+        - heading "CGPA Calculator" [level=1] [ref=e42]
+        - paragraph [ref=e43]: MCKRU · Version 1.2.0
+        - paragraph [ref=e45]: Loading your saved record…
+        - paragraph [ref=e46]: Developed by Jibran Khan Dehpal
+    - generic [ref=e49]:
+      - generic [ref=e51]: 9:41
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]: SA
+            - generic [ref=e71]:
+              - generic [ref=e72]: Welcome back, Sam
+              - generic [ref=e73]: Semester 4 · Spring 2026
+          - button "Toggle dark mode" [ref=e74] [cursor=pointer]
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - generic [ref=e80]: Your CGPA
+            - generic [ref=e81]:
+              - generic [ref=e82]: "3.62"
+              - generic [ref=e83]: / 4.00
+            - generic [ref=e84]: Across 6 semesters · 21 credit hours earned
+            - button "Add grades" [ref=e85] [cursor=pointer]
+          - heading "Your record" [level=3] [ref=e89]
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - generic [ref=e92]: "3.58"
+              - generic [ref=e93]: Avg GPA
+            - generic [ref=e94]:
+              - generic [ref=e95]: "6"
+              - generic [ref=e96]: Semesters
+            - generic [ref=e97]:
+              - generic [ref=e98]: "8"
+              - generic [ref=e99]: Subjects
+            - generic [ref=e100]:
+              - generic [ref=e101]: "21"
+              - generic [ref=e102]: Credits
+          - paragraph [ref=e108]: Short sessions beat skipped days. Twenty focused minutes today still counts.
+          - heading "Quick actions" [level=3] [ref=e110]
+          - generic [ref=e111]:
+            - button "GPA calculator 8 subjects" [ref=e112] [cursor=pointer]:
+              - generic [ref=e116]:
+                - generic [ref=e117]: GPA calculator
+                - generic [ref=e118]: 8 subjects
+            - button "CGPA tracker 6 semesters" [ref=e122] [cursor=pointer]:
+              - generic [ref=e127]:
+                - generic [ref=e128]: CGPA tracker
+                - generic [ref=e129]: 6 semesters
+            - button "Saved data On device" [ref=e133] [cursor=pointer]:
+              - generic [ref=e137]:
+                - generic [ref=e138]: Saved data
+                - generic [ref=e139]: On device
+            - button "Settings Theme & data" [ref=e143] [cursor=pointer]:
+              - generic [ref=e148]:
+                - generic [ref=e149]: Settings
+                - generic [ref=e150]: Theme & data
+      - navigation [ref=e154]:
+        - button "Home" [ref=e155] [cursor=pointer]
+        - button "GPA" [ref=e160] [cursor=pointer]
+        - button "CGPA" [ref=e164] [cursor=pointer]
+        - button "Data" [ref=e169] [cursor=pointer]
+        - button "Settings" [ref=e173] [cursor=pointer]
+    - generic [ref=e180]:
+      - generic [ref=e182]: 9:41
+      - generic [ref=e198]:
+        - generic [ref=e200]:
+          - heading "GPA Calculator" [level=2] [ref=e201]
+          - button "Add subject" [ref=e202] [cursor=pointer]
+        - generic [ref=e205]:
+          - generic [ref=e206]:
+            - generic [ref=e207]:
+              - generic [ref=e208]: "01"
+              - generic [ref=e209]: Data Structures
+              - button "Remove subject" [ref=e210] [cursor=pointer]
+            - generic [ref=e213]:
+              - generic [ref=e214]: Marks
+              - generic [ref=e215]:
+                - textbox "Marks for Data Structures" [ref=e216]: "84"
+                - generic [ref=e217]: / 100
+            - generic [ref=e218]:
+              - generic [ref=e219]: Credit hours
+              - generic [ref=e220]:
+                - button "1" [ref=e221] [cursor=pointer]
+                - button "2" [ref=e222] [cursor=pointer]
+                - button "3" [ref=e223] [cursor=pointer]
+                - button "4" [ref=e224] [cursor=pointer]
+                - button "5" [ref=e225] [cursor=pointer]
+            - generic [ref=e226]:
+              - generic [ref=e227]: Non-lab · weight 3
+              - generic [ref=e228]: A · 4.00
+          - generic [ref=e229]:
+            - generic [ref=e230]:
+              - generic [ref=e231]: "02"
+              - generic [ref=e232]: Operating Systems and Systems Programming Laboratory
+              - button "Remove subject" [ref=e233] [cursor=pointer]
+            - generic [ref=e236]:
+              - generic [ref=e237]: Marks
+              - generic [ref=e238]:
+                - textbox "Marks for Operating Systems Lab" [invalid] [ref=e239]: "132"
+                - generic [ref=e240]: / 100
+            - alert [ref=e241]: Marks must be between 0 and 100
+            - generic [ref=e244]:
+              - generic [ref=e245]: Lab
+              - button "Off" [ref=e246] [cursor=pointer]
+            - generic [ref=e249]:
+              - generic [ref=e250]: Fix marks to grade
+              - generic [ref=e251]: — pending
+          - generic [ref=e252]:
+            - generic [ref=e253]: Semester GPA
+            - generic [ref=e254]:
+              - generic [ref=e255]: "3.67"
+              - generic [ref=e256]: of 4.00
+            - paragraph [ref=e259]: Credit-weighted across 14 hours · lab marks doubled before lookup.
+      - navigation [ref=e260]:
+        - button "Home" [ref=e261] [cursor=pointer]
+        - button "GPA" [ref=e266] [cursor=pointer]
+        - button "CGPA" [ref=e270] [cursor=pointer]
+        - button "Data" [ref=e275] [cursor=pointer]
+        - button "Settings" [ref=e279] [cursor=pointer]
+    - generic [ref=e286]:
+      - generic [ref=e288]: 9:41
+      - generic [ref=e304]:
+        - generic [ref=e306]:
+          - heading "CGPA Tracker" [level=2] [ref=e307]
+          - button "Add semester" [ref=e308] [cursor=pointer]
+        - generic [ref=e311]:
+          - generic [ref=e312]:
+            - generic [ref=e313]:
+              - generic [ref=e314]: "01"
+              - generic [ref=e315]: Semester 1
+              - button "Remove semester" [ref=e316] [cursor=pointer]
+            - generic [ref=e319]:
+              - generic [ref=e320]: Semester GPA
+              - generic [ref=e321]:
+                - textbox "GPA for Semester 1" [ref=e322]: "3.80"
+                - generic [ref=e323]: / 4.00
+            - generic [ref=e324]:
+              - generic [ref=e325]: 5 subjects · 17 credits
+              - generic [ref=e326]: Excellent
+          - generic [ref=e327]:
+            - generic [ref=e328]:
+              - generic [ref=e329]: "02"
+              - generic [ref=e330]: Semester 2
+              - button "Remove semester" [ref=e331] [cursor=pointer]
+            - generic [ref=e334]:
+              - generic [ref=e335]: Semester GPA
+              - generic [ref=e336]:
+                - textbox "GPA for Semester 2" [ref=e337]: "3.45"
+                - generic [ref=e338]: / 4.00
+            - generic [ref=e339]:
+              - generic [ref=e340]: 6 subjects · 19 credits
+              - generic [ref=e341]: Good
+          - generic [ref=e342]:
+            - generic [ref=e343]:
+              - generic [ref=e344]: "03"
+              - generic [ref=e345]: Semester 3
+              - button "Remove semester" [ref=e346] [cursor=pointer]
+            - generic [ref=e349]:
+              - generic [ref=e350]: Semester GPA
+              - generic [ref=e351]:
+                - textbox "GPA for Semester 3" [ref=e352]: "3.10"
+                - generic [ref=e353]: / 4.00
+            - generic [ref=e354]:
+              - generic [ref=e355]: 4 subjects · 15 credits
+              - generic [ref=e356]: Average
+          - generic [ref=e357]:
+            - generic [ref=e358]: Cumulative CGPA
+            - generic [ref=e359]:
+              - generic [ref=e360]: "3.62"
+              - generic [ref=e361]: of 4.00
+            - paragraph [ref=e364]: Mean of 6 saved semesters · autosaves 500 ms after you stop typing.
+      - navigation [ref=e365]:
+        - button "Home" [ref=e366] [cursor=pointer]
+        - button "GPA" [ref=e371] [cursor=pointer]
+        - button "CGPA" [ref=e375] [cursor=pointer]
+        - button "Data" [ref=e380] [cursor=pointer]
+        - button "Settings" [ref=e384] [cursor=pointer]
+    - generic [ref=e391]:
+      - generic [ref=e393]: 9:41
+      - generic [ref=e409]:
+        - generic [ref=e411]:
+          - heading "Settings" [level=2] [ref=e412]
+          - button "Toggle dark mode" [ref=e413] [cursor=pointer]
+        - generic [ref=e417]:
+          - generic [ref=e418]:
+            - generic [ref=e419]: SA
+            - generic [ref=e420]:
+              - generic [ref=e421]: Sam Ahmed
+              - generic [ref=e422]: Tap the name to rename · max 20 characters
+            - button "Change name and avatar" [ref=e423] [cursor=pointer]
+          - heading "Appearance" [level=3] [ref=e427]
+          - generic [ref=e429]:
+            - generic [ref=e433]:
+              - generic [ref=e434]: Dark mode
+              - generic [ref=e435]: Flips every screen instantly
+            - button "Dark mode" [ref=e436] [cursor=pointer]:
+              - generic [ref=e437]: "Off"
+          - heading "Data" [level=3] [ref=e440]
+          - generic [ref=e441]:
+            - button "Grade Reference Marks → letter → GPA table" [ref=e442] [cursor=pointer]:
+              - generic [ref=e447]:
+                - generic [ref=e448]: Grade Reference
+                - generic [ref=e449]: Marks → letter → GPA table
+            - button "Reset All Data Clears subjects and semesters" [ref=e453] [cursor=pointer]:
+              - generic [ref=e458]:
+                - generic [ref=e459]: Reset All Data
+                - generic [ref=e460]: Clears subjects and semesters
+          - heading "About" [level=3] [ref=e465]
+          - generic [ref=e466]:
+            - button "About this app v1.2.0 · Jibran Khan Dehpal" [ref=e467] [cursor=pointer]:
+              - generic [ref=e471]:
+                - generic [ref=e472]: About this app
+                - generic [ref=e473]: v1.2.0 · Jibran Khan Dehpal
+            - generic [ref=e477]:
+              - generic [ref=e481]:
+                - generic [ref=e482]: Storage
+                - generic [ref=e483]: Saved on this device only
+              - generic [ref=e484]: Local
+      - navigation [ref=e485]:
+        - button "Home" [ref=e486] [cursor=pointer]
+        - button "GPA" [ref=e491] [cursor=pointer]
+        - button "CGPA" [ref=e495] [cursor=pointer]
+        - button "Data" [ref=e500] [cursor=pointer]
+        - button "Settings" [ref=e504] [cursor=pointer]
+  - generic [ref=e509]: Dark mode
+  - generic [ref=e512]:
+    - generic [ref=e515]:
+      - generic [ref=e517]: 9:41
+      - generic [ref=e533]:
+        - heading "CGPA Calculator" [level=1] [ref=e538]
+        - paragraph [ref=e539]: MCKRU · Version 1.2.0
+        - paragraph [ref=e541]: Loading your saved record…
+        - paragraph [ref=e542]: Developed by Jibran Khan Dehpal
+    - generic [ref=e545]:
+      - generic [ref=e547]: 9:41
+      - generic [ref=e563]:
+        - generic [ref=e564]:
+          - generic [ref=e565]:
+            - generic [ref=e566]: SA
+            - generic [ref=e567]:
+              - generic [ref=e568]: Welcome back, Sam
+              - generic [ref=e569]: Semester 4 · Spring 2026
+          - button "Toggle light mode" [ref=e570] [cursor=pointer]
+        - generic [ref=e573]:
+          - generic [ref=e574]:
+            - generic [ref=e575]: Your CGPA
+            - generic [ref=e576]:
+              - generic [ref=e577]: "3.62"
+              - generic [ref=e578]: / 4.00
+            - generic [ref=e579]: Across 6 semesters · 21 credit hours earned
+            - button "Add grades" [ref=e580] [cursor=pointer]
+          - heading "Your record" [level=3] [ref=e584]
+          - generic [ref=e585]:
+            - generic [ref=e586]:
+              - generic [ref=e587]: "3.58"
+              - generic [ref=e588]: Avg GPA
+            - generic [ref=e589]:
+              - generic [ref=e590]: "6"
+              - generic [ref=e591]: Semesters
+            - generic [ref=e592]:
+              - generic [ref=e593]: "8"
+              - generic [ref=e594]: Subjects
+            - generic [ref=e595]:
+              - generic [ref=e596]: "21"
+              - generic [ref=e597]: Credits
+          - paragraph [ref=e603]: Short sessions beat skipped days. Twenty focused minutes today still counts.
+          - heading "Quick actions" [level=3] [ref=e605]
+          - generic [ref=e606]:
+            - button "GPA calculator 8 subjects" [ref=e607] [cursor=pointer]:
+              - generic [ref=e611]:
+                - generic [ref=e612]: GPA calculator
+                - generic [ref=e613]: 8 subjects
+            - button "CGPA tracker 6 semesters" [ref=e617] [cursor=pointer]:
+              - generic [ref=e622]:
+                - generic [ref=e623]: CGPA tracker
+                - generic [ref=e624]: 6 semesters
+            - button "Saved data On device" [ref=e628] [cursor=pointer]:
+              - generic [ref=e632]:
+                - generic [ref=e633]: Saved data
+                - generic [ref=e634]: On device
+            - button "Settings Theme & data" [ref=e638] [cursor=pointer]:
+              - generic [ref=e643]:
+                - generic [ref=e644]: Settings
+                - generic [ref=e645]: Theme & data
+      - navigation [ref=e649]:
+        - button "Home" [ref=e650] [cursor=pointer]
+        - button "GPA" [ref=e655] [cursor=pointer]
+        - button "CGPA" [ref=e659] [cursor=pointer]
+        - button "Data" [ref=e664] [cursor=pointer]
+        - button "Settings" [ref=e668] [cursor=pointer]
+    - generic [ref=e675]:
+      - generic [ref=e677]: 9:41
+      - generic [ref=e693]:
+        - generic [ref=e695]:
+          - heading "GPA Calculator" [level=2] [ref=e696]
+          - button "Add subject" [ref=e697] [cursor=pointer]
+        - generic [ref=e700]:
+          - generic [ref=e701]:
+            - generic [ref=e702]:
+              - generic [ref=e703]: "01"
+              - generic [ref=e704]: Data Structures
+              - button "Remove subject" [ref=e705] [cursor=pointer]
+            - generic [ref=e708]:
+              - generic [ref=e709]: Marks
+              - generic [ref=e710]:
+                - textbox "Marks for Data Structures" [ref=e711]: "84"
+                - generic [ref=e712]: / 100
+            - generic [ref=e713]:
+              - generic [ref=e714]: Credit hours
+              - generic [ref=e715]:
+                - button "1" [ref=e716] [cursor=pointer]
+                - button "2" [ref=e717] [cursor=pointer]
+                - button "3" [ref=e718] [cursor=pointer]
+                - button "4" [ref=e719] [cursor=pointer]
+                - button "5" [ref=e720] [cursor=pointer]
+            - generic [ref=e721]:
+              - generic [ref=e722]: Non-lab · weight 3
+              - generic [ref=e723]: A · 4.00
+          - generic [ref=e724]:
+            - generic [ref=e725]:
+              - generic [ref=e726]: "02"
+              - generic [ref=e727]: Operating Systems and Systems Programming Laboratory
+              - button "Remove subject" [ref=e728] [cursor=pointer]
+            - generic [ref=e731]:
+              - generic [ref=e732]: Marks
+              - generic [ref=e733]:
+                - textbox "Marks for Operating Systems Lab" [invalid] [ref=e734]: "132"
+                - generic [ref=e735]: / 100
+            - alert [ref=e736]: Marks must be between 0 and 100
+            - generic [ref=e739]:
+              - generic [ref=e740]: Lab
+              - button "Off" [ref=e741] [cursor=pointer]
+            - generic [ref=e744]:
+              - generic [ref=e745]: Fix marks to grade
+              - generic [ref=e746]: — pending
+          - generic [ref=e747]:
+            - generic [ref=e748]: Semester GPA
+            - generic [ref=e749]:
+              - generic [ref=e750]: "3.67"
+              - generic [ref=e751]: of 4.00
+            - paragraph [ref=e754]: Credit-weighted across 14 hours · lab marks doubled before lookup.
+      - navigation [ref=e755]:
+        - button "Home" [ref=e756] [cursor=pointer]
+        - button "GPA" [ref=e761] [cursor=pointer]
+        - button "CGPA" [ref=e765] [cursor=pointer]
+        - button "Data" [ref=e770] [cursor=pointer]
+        - button "Settings" [ref=e774] [cursor=pointer]
+    - generic [ref=e781]:
+      - generic [ref=e783]: 9:41
+      - generic [ref=e799]:
+        - generic [ref=e801]:
+          - heading "CGPA Tracker" [level=2] [ref=e802]
+          - button "Add semester" [ref=e803] [cursor=pointer]
+        - generic [ref=e806]:
+          - generic [ref=e807]:
+            - generic [ref=e808]:
+              - generic [ref=e809]: "01"
+              - generic [ref=e810]: Semester 1
+              - button "Remove semester" [ref=e811] [cursor=pointer]
+            - generic [ref=e814]:
+              - generic [ref=e815]: Semester GPA
+              - generic [ref=e816]:
+                - textbox "GPA for Semester 1" [ref=e817]: "3.80"
+                - generic [ref=e818]: / 4.00
+            - generic [ref=e819]:
+              - generic [ref=e820]: 5 subjects · 17 credits
+              - generic [ref=e821]: Excellent
+          - generic [ref=e822]:
+            - generic [ref=e823]:
+              - generic [ref=e824]: "02"
+              - generic [ref=e825]: Semester 2
+              - button "Remove semester" [ref=e826] [cursor=pointer]
+            - generic [ref=e829]:
+              - generic [ref=e830]: Semester GPA
+              - generic [ref=e831]:
+                - textbox "GPA for Semester 2" [ref=e832]: "3.45"
+                - generic [ref=e833]: / 4.00
+            - generic [ref=e834]:
+              - generic [ref=e835]: 6 subjects · 19 credits
+              - generic [ref=e836]: Good
+          - generic [ref=e837]:
+            - generic [ref=e838]:
+              - generic [ref=e839]: "03"
+              - generic [ref=e840]: Semester 3
+              - button "Remove semester" [ref=e841] [cursor=pointer]
+            - generic [ref=e844]:
+              - generic [ref=e845]: Semester GPA
+              - generic [ref=e846]:
+                - textbox "GPA for Semester 3" [ref=e847]: "3.10"
+                - generic [ref=e848]: / 4.00
+            - generic [ref=e849]:
+              - generic [ref=e850]: 4 subjects · 15 credits
+              - generic [ref=e851]: Average
+          - generic [ref=e852]:
+            - generic [ref=e853]: Cumulative CGPA
+            - generic [ref=e854]:
+              - generic [ref=e855]: "3.62"
+              - generic [ref=e856]: of 4.00
+            - paragraph [ref=e859]: Mean of 6 saved semesters · autosaves 500 ms after you stop typing.
+      - navigation [ref=e860]:
+        - button "Home" [ref=e861] [cursor=pointer]
+        - button "GPA" [ref=e866] [cursor=pointer]
+        - button "CGPA" [ref=e870] [cursor=pointer]
+        - button "Data" [ref=e875] [cursor=pointer]
+        - button "Settings" [ref=e879] [cursor=pointer]
+    - generic [ref=e886]:
+      - generic [ref=e888]: 9:41
+      - generic [ref=e904]:
+        - generic [ref=e906]:
+          - heading "Settings" [level=2] [ref=e907]
+          - button "Toggle light mode" [ref=e908] [cursor=pointer]
+        - generic [ref=e911]:
+          - generic [ref=e912]:
+            - generic [ref=e913]: SA
+            - generic [ref=e914]:
+              - generic [ref=e915]: Sam Ahmed
+              - generic [ref=e916]: Tap the name to rename · max 20 characters
+            - button "Change name and avatar" [ref=e917] [cursor=pointer]
+          - heading "Appearance" [level=3] [ref=e921]
+          - generic [ref=e923]:
+            - generic [ref=e927]:
+              - generic [ref=e928]: Dark mode
+              - generic [ref=e929]: Flips every screen instantly
+            - button "Dark mode" [pressed] [ref=e930] [cursor=pointer]:
+              - generic [ref=e931]: "On"
+          - heading "Data" [level=3] [ref=e934]
+          - generic [ref=e935]:
+            - button "Grade Reference Marks → letter → GPA table" [ref=e936] [cursor=pointer]:
+              - generic [ref=e941]:
+                - generic [ref=e942]: Grade Reference
+                - generic [ref=e943]: Marks → letter → GPA table
+            - button "Reset All Data Clears subjects and semesters" [ref=e947] [cursor=pointer]:
+              - generic [ref=e952]:
+                - generic [ref=e953]: Reset All Data
+                - generic [ref=e954]: Clears subjects and semesters
+          - heading "About" [level=3] [ref=e959]
+          - generic [ref=e960]:
+            - button "About this app v1.2.0 · Jibran Khan Dehpal" [ref=e961] [cursor=pointer]:
+              - generic [ref=e965]:
+                - generic [ref=e966]: About this app
+                - generic [ref=e967]: v1.2.0 · Jibran Khan Dehpal
+            - generic [ref=e971]:
+              - generic [ref=e975]:
+                - generic [ref=e976]: Storage
+                - generic [ref=e977]: Saved on this device only
+              - generic [ref=e978]: Local
+      - navigation [ref=e979]:
+        - button "Home" [ref=e980] [cursor=pointer]
+        - button "GPA" [ref=e985] [cursor=pointer]
+        - button "CGPA" [ref=e989] [cursor=pointer]
+        - button "Data" [ref=e994] [cursor=pointer]
+        - button "Settings" [ref=e998] [cursor=pointer]
+  - generic [ref=e1003]:
+    - heading "Design tokens & component states" [level=2] [ref=e1004]
+    - generic [ref=e1005]:
+      - generic [ref=e1006]:
+        - heading "Light theme" [level=4] [ref=e1007]
+        - paragraph [ref=e1008]: One neutral ladder, one accent. Inter throughout, 8px radius, 1px borders, 8px baseline grid.
+        - generic [ref=e1009]:
+          - generic [ref=e1010]:
+            - text: Background
+            - code [ref=e1012]: "#ffffff"
+          - generic [ref=e1013]:
+            - text: Surface
+            - code [ref=e1015]: "#f7f8fa"
+          - generic [ref=e1016]:
+            - text: Foreground
+            - code [ref=e1018]: "#111111"
+          - generic [ref=e1019]:
+            - text: Muted
+            - code [ref=e1021]: "#6b7280"
+          - generic [ref=e1022]:
+            - text: Border
+            - code [ref=e1024]: "#d9dee7"
+          - generic [ref=e1025]:
+            - text: Accent
+            - code [ref=e1027]: "#1677ff"
+      - generic [ref=e1028]:
+        - heading "Dark theme" [level=4] [ref=e1029]
+        - paragraph [ref=e1030]: Same six tokens re-mixed in oklch — no new hues, just shifted lightness for night reading.
+        - generic [ref=e1031]:
+          - generic [ref=e1032]:
+            - text: Background
+            - code [ref=e1034]: "#111111"
+          - generic [ref=e1035]:
+            - text: Surface
+            - code [ref=e1037]: mix 84/16
+          - generic [ref=e1038]:
+            - text: Foreground
+            - code [ref=e1040]: "#ffffff"
+          - generic [ref=e1041]:
+            - text: Muted
+            - code [ref=e1043]: mix 52/48
+          - generic [ref=e1044]:
+            - text: Border
+            - code [ref=e1046]: mix 20/80
+          - generic [ref=e1047]:
+            - text: Accent
+            - code [ref=e1049]: "#1677ff"
+      - generic [ref=e1050]:
+        - heading "Type & geometry" [level=4] [ref=e1051]
+        - paragraph [ref=e1052]: Display and body both Inter (system-ui fallback). Numbers set in tabular figures so columns never jitter.
+        - generic [ref=e1053]:
+          - generic [ref=e1054]:
+            - generic [ref=e1055]: Aa
+            - text: Display · 20–46px / 800 / -0.03em
+          - generic [ref=e1056]:
+            - generic [ref=e1057]: Aa
+            - text: Headings · 14–15px / 700
+          - generic [ref=e1058]:
+            - generic [ref=e1059]: Aa
+            - text: Body · 12.5–13px / 400–500
+          - generic [ref=e1060]:
+            - code [ref=e1061]: LABEL
+            - text: Eyebrows · mono / 10px / 0.16em
+          - generic [ref=e1062]: Radius 8px · borders 1px · grid 8px · targets ≥44px
+    - generic [ref=e1064]:
+      - generic [ref=e1065]:
+        - paragraph [ref=e1066]: State 1 — Empty (Storage)
+        - generic [ref=e1067]:
+          - generic [ref=e1071]: No saved data yet
+          - paragraph [ref=e1072]: Grades you enter are stored on this device only. Start with one subject.
+          - button "Add your first subject" [ref=e1073] [cursor=pointer]
+      - paragraph [ref=e1075]: State 2 — Loading (skeleton)
+      - generic [ref=e1087]:
+        - paragraph [ref=e1088]: State 3 — Error (retry)
+        - generic [ref=e1090]:
+          - generic [ref=e1091]: Couldn’t save that change
+          - paragraph [ref=e1094]: Storage write failed. Your input is kept on screen — nothing was cleared.
+          - generic [ref=e1095]:
+            - button "Retry" [ref=e1096] [cursor=pointer]
+            - button "Copy error ID" [ref=e1097] [cursor=pointer]
+  - paragraph [ref=e1098]: Restyle only · navigation, data model and calculations unchanged

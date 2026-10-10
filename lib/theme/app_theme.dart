@@ -1,162 +1,137 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+class Palette {
+  final Color bg, surface, field, fg, muted, border;
+  final Color accent, accentSoft, accentInk, accentDeep;
+  final Color invBg, invFg, invEyebrow, tabbar, danger;
+
+  const Palette({
+    required this.bg,
+    required this.surface,
+    required this.field,
+    required this.fg,
+    required this.muted,
+    required this.border,
+    required this.accent,
+    required this.accentSoft,
+    required this.accentInk,
+    required this.accentDeep,
+    required this.invBg,
+    required this.invFg,
+    required this.invEyebrow,
+    required this.tabbar,
+    required this.danger,
+  });
+
+  static const Palette light = Palette(
+    bg: Color(0xFFFFFFFF),
+    surface: Color(0xFFF7F8FA),
+    field: Color(0xFFFFFFFF),
+    fg: Color(0xFF111111),
+    muted: Color(0xFF6B7280),
+    border: Color(0xFFD9DEE7),
+    accent: Color(0xFF1677FF),
+    accentSoft: Color(0xFFEAF3FF),
+    accentInk: Color(0xFF1561CB),
+    accentDeep: Color(0xFF1564D4),
+    invBg: Color(0xFF111111),
+    invFg: Color(0xFFFFFFFF),
+    invEyebrow: Color(0xFF6FABFF),
+    tabbar: Color(0xFFFFFFFF),
+    danger: Color(0xFFDC2626),
+  );
+
+  static const Palette dark = Palette(
+    bg: Color(0xFF111111),
+    surface: Color(0xFF303030),
+    field: Color(0xFF414141),
+    fg: Color(0xFFFFFFFF),
+    muted: Color(0xFFA3A7AE),
+    border: Color(0xFF3A3B40),
+    accent: Color(0xFF1677FF),
+    accentSoft: Color(0xFF152F4E),
+    accentInk: Color(0xFF579DFF),
+    accentDeep: Color(0xFF1564D4),
+    invBg: Color(0xFFFFFFFF),
+    invFg: Color(0xFF111111),
+    invEyebrow: Color(0xFF1450A4),
+    tabbar: Color(0xFF282828),
+    danger: Color(0xFFF87171),
+  );
+
+  static Palette of(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? dark : light;
+}
+
 class AppTheme {
-  // ========== DARK THEME COLORS ==========
-  static const Color darkBgPrimary = Color(0xFF080C18);
-  static const Color darkBgGradientStart = Color(0xFF0D1326);
-  static const Color darkBgGradientEnd = Color(0xFF111833);
-  static const Color darkSurfaceGlass = Color(0x0FFFFFFF);
-  static const Color darkBorderGlass = Color(0x1AFFFFFF);
-  static const Color darkTextPrimary = Color(0xFFF1F5F9);
-  static const Color darkTextSecondary = Color(0xFF94A3B8);
-  static const Color darkTextMuted = Color(0xFF475569);
+  static ThemeData light() => _build(Brightness.light, Palette.light);
+  static ThemeData dark() => _build(Brightness.dark, Palette.dark);
 
-  // ========== LIGHT THEME COLORS ==========
-  static const Color lightBgPrimary = Color(0xFFF8FAFC);
-  static const Color lightBgGradientStart = Color(0xFFEFF6FF);
-  static const Color lightBgGradientEnd = Color(0xFFF1F5F9);
-  static const Color lightSurfaceGlass = Color(0x0A000000);
-  static const Color lightBorderGlass = Color(0x14000000);
-  static const Color lightTextPrimary = Color(0xFF0F172A);
-  static const Color lightTextSecondary = Color(0xFF475569);
-  static const Color lightTextMuted = Color(0xFF94A3B8);
+  static ThemeData _build(Brightness brightness, Palette p) {
+    final base = brightness == Brightness.dark ? ThemeData.dark() : ThemeData.light();
+    final textTheme = GoogleFonts.interTextTheme(base.textTheme)
+        .apply(bodyColor: p.fg, displayColor: p.fg);
 
-  // ========== SHARED COLORS ==========
-  static const Color accentPrimary = Color(0xFF6366F1);
-  static const Color accentSecondary = Color(0xFFA855F7);
-  static const Color accentTertiary = Color(0xFF3B82F6);
+    OutlineInputBorder outline(Color c, [double w = 1]) => OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: c, width: w),
+        );
 
-  static const Color success = Color(0xFF10B981);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color danger = Color(0xFFEF4444);
-
-  // ========== THEME-AWARE HELPERS ==========
-  static Color bgPrimary(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkBgPrimary : lightBgPrimary;
-
-  static Color bgGradientStart(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkBgGradientStart : lightBgGradientStart;
-
-  static Color bgGradientEnd(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkBgGradientEnd : lightBgGradientEnd;
-
-  static Color textPrimary(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkTextPrimary : lightTextPrimary;
-
-  static Color textSecondary(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkTextSecondary : lightTextSecondary;
-
-  static Color textMuted(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkTextMuted : lightTextMuted;
-
-  static Color surfaceGlass(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkSurfaceGlass : lightSurfaceGlass;
-
-  static Color borderGlass(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? darkBorderGlass : lightBorderGlass;
-
-  // ========== DARK THEME ==========
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    scaffoldBackgroundColor: darkBgPrimary,
-    colorScheme: const ColorScheme.dark(
-      primary: accentPrimary,
-      secondary: accentSecondary,
-      surface: darkBgPrimary,
-      error: danger,
-    ),
-    textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme).copyWith(
-      displayLarge: GoogleFonts.lexend(
-        fontSize: 56,
-        fontWeight: FontWeight.bold,
-        color: darkTextPrimary,
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      scaffoldBackgroundColor: p.bg,
+      colorScheme: ColorScheme(
+        brightness: brightness,
+        primary: p.accent,
+        onPrimary: Colors.white,
+        secondary: p.accent,
+        onSecondary: Colors.white,
+        error: p.danger,
+        onError: Colors.white,
+        surface: p.surface,
+        onSurface: p.fg,
+        outline: p.border,
       ),
-      displayMedium: GoogleFonts.lexend(
-        fontSize: 48,
-        fontWeight: FontWeight.bold,
-        color: darkTextPrimary,
+      textTheme: textTheme,
+      cardTheme: CardThemeData(
+        color: p.surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: p.border),
+        ),
       ),
-      headlineMedium: GoogleFonts.lexend(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        color: darkTextPrimary,
+      dialogTheme: DialogThemeData(
+        backgroundColor: p.bg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: p.border),
+        ),
       ),
-      titleLarge: GoogleFonts.lexend(
-        fontSize: 20,
-        fontWeight: FontWeight.w500,
-        color: darkTextPrimary,
+      appBarTheme: AppBarTheme(
+        backgroundColor: p.bg,
+        surfaceTintColor: Colors.transparent,
       ),
-      bodyLarge: GoogleFonts.inter(fontSize: 16, color: darkTextPrimary),
-      bodyMedium: GoogleFonts.inter(fontSize: 14, color: darkTextSecondary),
-      labelLarge: GoogleFonts.inter(
-        fontSize: 13,
-        fontWeight: FontWeight.w700,
-        color: darkTextPrimary,
-        letterSpacing: 1.0,
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: p.field,
+        hintStyle: TextStyle(color: p.muted, fontWeight: FontWeight.w500),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        border: outline(p.border),
+        enabledBorder: outline(p.border),
+        focusedBorder: outline(p.accent, 1.5),
+        errorBorder: outline(p.accent),
+        focusedErrorBorder: outline(p.accent, 1.5),
       ),
-      labelSmall: GoogleFonts.inter(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: darkTextMuted,
-        letterSpacing: 1.5,
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: p.accentInk,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
       ),
-    ),
-  );
-
-  // ========== LIGHT THEME ==========
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    scaffoldBackgroundColor: lightBgPrimary,
-    colorScheme: const ColorScheme.light(
-      primary: accentPrimary,
-      secondary: accentSecondary,
-      surface: lightBgPrimary,
-      error: danger,
-    ),
-    textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme).copyWith(
-      displayLarge: GoogleFonts.lexend(
-        fontSize: 56,
-        fontWeight: FontWeight.bold,
-        color: lightTextPrimary,
-      ),
-      displayMedium: GoogleFonts.lexend(
-        fontSize: 48,
-        fontWeight: FontWeight.bold,
-        color: lightTextPrimary,
-      ),
-      headlineMedium: GoogleFonts.lexend(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        color: lightTextPrimary,
-      ),
-      titleLarge: GoogleFonts.lexend(
-        fontSize: 20,
-        fontWeight: FontWeight.w500,
-        color: lightTextPrimary,
-      ),
-      bodyLarge: GoogleFonts.inter(fontSize: 16, color: lightTextPrimary),
-      bodyMedium: GoogleFonts.inter(fontSize: 14, color: lightTextSecondary),
-      labelLarge: GoogleFonts.inter(
-        fontSize: 13,
-        fontWeight: FontWeight.w700,
-        color: lightTextPrimary,
-        letterSpacing: 1.0,
-      ),
-      labelSmall: GoogleFonts.inter(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: lightTextMuted,
-        letterSpacing: 1.5,
-      ),
-    ),
-  );
-
-  static Color getGpaColor(double gpa) {
-    if (gpa >= 3.5) return success;
-    if (gpa >= 2.5) return warning;
-    return danger;
+      dividerTheme: DividerThemeData(color: p.border, thickness: 1, space: 1),
+    );
   }
 }
